@@ -97,3 +97,47 @@ Your browser should automatically open a new tab with the application running.
 3.  **Start Chatting**: Type your questions into the chat input box at the bottom of the screen.
 4.  **Use Suggestions**: The AI will provide clickable follow-up questions to help you explore the topic further.
 Use Arrow Up and Arrow Down to select a turn, Enter to jump to it, and Escape to return to the chat.
+For Presentation: Objective:
+Your task is to generate the complete text content for a compelling 10-slide presentation for a hackathon. This presentation must introduce, explain, and sell our project: the "Conversational AI Teaching Assistant."
+Role:
+Act as an expert presentation designer and tech storyteller. Your language should be clear, persuasive, visionary, and tailored to a hackathon audience (judges, developers, potential investors). Focus on the "why" and the "how," not just the "what."
+Audience:
+The audience consists of hackathon judges who are technically proficient but also looking for real-world impact and innovation. They have limited time and need to be impressed quickly.
+Instructions:
+Generate content for exactly 10 slides.
+For each slide, provide a clear ## Title: and the **Content:** in concise bullet points or short paragraphs.
+The tone should be confident and exciting.
+Use the complete project brief provided below. You have no prior knowledge of this project; everything you need is in this prompt.
+Emphasize the problem, the elegance of our solution, and the clear advantages over existing tools.
+[START PROJECT BRIEF]
+Project Name: Conversational AI Teaching Assistant
+Core Problem We Are Solving:
+Learning from digital documents, especially dense academic PDFs, is a static and inefficient process. Students face several key challenges:
+Information Overload: It's hard to find specific answers within hundreds of pages. A simple Ctrl+F search is not enough as it misses context and related concepts.
+Lack of Interactivity: PDFs are "read-only." You can't ask them questions or get clarifications.
+Disconnected Learning: Students must constantly switch between their textbook PDF and a generic web browser to get more context, leading to distraction and wasted time.
+Generic AI Is Not Enough: General-purpose AI chatbots (like ChatGPT) have no knowledge of the user's specific course material, leading to generic or even incorrect answers that aren't grounded in the textbook's content.
+Our Solution: An AI Assistant That Fuses Your Documents with the Web
+We have built an intelligent application that transforms any PDF into an interactive, conversational learning partner. A user uploads their document, and the AI assistant can answer questions using knowledge derived both from the document itself and from real-time web searches, providing a truly comprehensive and personalized learning experience.
+How It Works: The Technical Architecture & Workflow
+Our application is built on a sophisticated Retrieval-Augmented Generation (RAG) architecture powered by a multi-agent system using LangGraph. This isn't just a simple RAG pipeline; it's an intelligent, decision-making workflow.
+Step 1: Document Ingestion: The user uploads a PDF. We chunk the document, generate embeddings using Google's text-embedding-004 model, and store it in a ChromaDB vector database. This creates a searchable knowledge base of the document.
+Step 2: The Multi-Agent Workflow Begins: When a user asks a question, it triggers our LangGraph workflow.
+Query Rewriter Agent: If the user asks a follow-up question (e.g., "why is that?"), this agent intelligently rewrites it into a complete, standalone question using the chat history for context.
+Multi-Query Agent: To ensure we don't miss any relevant information, this agent expands the single user query into 5-6 diverse, parallel search queries.
+Router Agent: This is the "brain" of our system. It analyzes the user's intent and classifies the query (e.g., a factual lookup, a request for a summary, a simple greeting). This decision dictates the path the workflow will take.
+Step 3: Hybrid & Parallel Search (The Optimization):
+If the router decides it's a factual query, it triggers two searches simultaneously using Python's asyncio:
+Vector DB Agent: Searches the user's PDF content in ChromaDB.
+Web Search Agent: Searches the live web using the Google Custom Search API.
+This parallel processing drastically reduces latency compared to a sequential approach.
+Step 4: Response Generation: The combined, de-duplicated context from both the PDF and the web is passed to our final agent. This agent uses Google's gemini-2.0-flash model to synthesize all the information and generate a single, coherent, and accurate answer, complete with citations from the PDF.
+Why We Are Better Than Existing Approaches:
+vs. Standard PDF Readers: We offer semantic, conversational search, not just keyword matching. We find concepts, not just words.
+vs. Generic Chatbots: Our answers are grounded in the user's actual course material, eliminating hallucinations and ensuring relevance. We provide the best of both worlds: specific knowledge from the text and broad context from the web.
+vs. Simple RAG Systems: Our multi-agent workflow is more robust. The router agent prevents unnecessary web searches for simple greetings, and the multi-query agent provides a richer, more comprehensive context, leading to superior answer quality.
+Real-World Problem Solving & Impact:
+This project directly solves the problem of inefficient and isolated studying. It transforms learning from a passive activity into an active, engaging dialogue.
+For Students: Saves dozens of hours, provides instant clarification, and helps connect course concepts to real-world knowledge, leading to deeper understanding and better grades.
+For Professionals: Allows researchers, lawyers, or analysts to quickly digest and query dense technical documents, reports, or legal texts, dramatically improving productivity.
+This is a hackathon project, and our key innovation is the intelligent, optimized, and multi-pathed agentic workflow that delivers a truly superior user experience.
