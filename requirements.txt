@@ -1,0 +1,14 @@
+# requirements.txt
+streamlit>=1.35.0
+python-dotenv>=1.0.1
+pypdf>=4.2.0
+chromadb>=0.5.3
+
+# LangChain core components
+langchain>=0.2.5
+langgraph>=0.0.65
+
+# Google AI libraries (direct and wrappers)
+google-generativeai>=0.7.1
+google-api-python-client>=2.135.0
+langchain-google-genai>=1.0.6
