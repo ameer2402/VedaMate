@@ -34,12 +34,13 @@
 - [🎯 The Problem We're Solving](#-the-problem-were-solving)
 - [✨ Our Solution](#-our-solution)
 - [🚀 Key Features](#-key-features)
-- [🏗️ Architecture & Tech Stack](#️-architecture--tech-stack)
+- [🏗️ Architecture](#️-architecture)
+- [🛠️ Tech Stack](#️-tech-stack)
 - [🤖 Meet the Agents](#-meet-the-agents)
 - [🆚 Why VedaMate Stands Out](#-why-vedamate-stands-out)
 - [📦 Setup & Installation](#-setup--installation)
 - [🎮 How to Use](#-how-to-use)
-- [📊 Performance & Impact Metrics](#-performance--impact-metrics)
+- [📊 Performance Metrics](#-performance-metrics)
 - [🌍 Real-World Impact](#-real-world-impact)
 - [🗺️ Roadmap](#️-roadmap)
 - [🤝 Contributing](#-contributing)
@@ -59,6 +60,10 @@
 
 Whether you're a **student** decoding a 500-page textbook, a **researcher** parsing dense academic papers, or a **professional** analyzing legal/technical documents — VedaMate delivers semantic, citation-backed answers in seconds.
 
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
 ## 🎯 The Problem We're Solving
 
 Learning from digital documents today is **broken**:
@@ -69,6 +74,10 @@ Learning from digital documents today is **broken**:
 | **Zero Interactivity** | PDFs are read-only — you can't ask, clarify, or explore |
 | **Disconnected Learning** | Constant tab-switching between textbook & browser kills focus |
 | **Generic AI Limitations** | ChatGPT has no clue about your specific course material → hallucinations |
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
 
 ## ✨ Our Solution
 
@@ -117,55 +126,93 @@ An **intelligent agentic application** that fuses your **personal documents** wi
   <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
 </div>
 
-## 🏗️ Architecture & Tech Stack
-┌─────────────────────────────────────────────────────────────────────┐
-│ USER QUERY (Streamlit UI) │
-└──────────────────────────────┬──────────────────────────────────────┘
-▼
-┌─────────────────────────────────────────────────────────────────────┐
-│ 🧠 LANGGRAPH MULTI-AGENT WORKFLOW │
-│ │
-│ ┌────────────────┐ ┌────────────────┐ ┌─────────────────┐ │
-│ │ Query Rewriter │───▶│ Multi-Query │───▶│ Router Agent │ │
-│ │ Agent │ │ Generator │ │ (Intent Classify)│ │
-│ └────────────────┘ └────────────────┘ └────────┬────────┘ │
-│ │ │
-│ ┌────────────────────────────┴─────┐ │
-│ ▼ ▼ │
-│ ┌──────────────────────┐ ┌────────────────────┐ │
-│ │ 📚 Vector DB Agent │ ║async║ │ 🌐 Web Search Agent│ │
-│ │ (ChromaDB) │ ╚═════╝ │ (Google CSE API) │ │
-│ └──────────┬───────────┘ └─────────┬──────────┘ │
-│ └──────────┬────────────────────┘ │
-│ ▼ │
-│ ┌────────────────────────┐ │
-│ │ 🎯 Response Synthesizer│ │
-│ │ (Gemini 2.0 Flash) │ │
-│ └────────────┬────────────┘ │
-└────────────────────────────────────┼─────────────────────────────────┘
-▼
-╔═══════════════════════════════════╗
-║ 📡 STREAMED RESPONSE TO USER UI ║
-╚═══════════════════════════════════╝
+## 🏗️ Architecture
 
 ### 🔥 Modern RAG Pipeline Orchestrated by LangGraph
 
-### 🛠️ Tech Stack
+The end-to-end workflow is a **stateful multi-agent graph** where each agent performs a specialized task — from query rewriting to hybrid retrieval to final response synthesis.
+
+```text
+                ┌─────────────────────────────┐
+                │   USER QUERY (Streamlit UI) │
+                └──────────────┬──────────────┘
+                               │
+                               ▼
+        ╔══════════════════════════════════════════════╗
+        ║      🧠 LANGGRAPH MULTI-AGENT WORKFLOW       ║
+        ╚══════════════════════════════════════════════╝
+                               │
+                               ▼
+                ┌─────────────────────────────┐
+                │  🔄 Query Rewriter Agent    │
+                │  (Standalone Query Builder) │
+                └──────────────┬──────────────┘
+                               │
+                               ▼
+                ┌─────────────────────────────┐
+                │  🔀 Multi-Query Generator    │
+                │  (5–6 Diverse Sub-Queries)  │
+                └──────────────┬──────────────┘
+                               │
+                               ▼
+                ┌─────────────────────────────┐
+                │  🧭 Router Agent            │
+                │  (Intent Classifier)        │
+                └──────────────┬──────────────┘
+                               │
+                ┌──────────────┴──────────────┐
+                │      ⚡ ASYNC PARALLEL       │
+                ▼                             ▼
+   ┌────────────────────────┐   ┌────────────────────────┐
+   │ 📚 Vector DB Agent     │   │ 🌐 Web Search Agent    │
+   │ (ChromaDB Embeddings)  │   │ (Google CSE API)       │
+   └────────────┬───────────┘   └────────────┬───────────┘
+                │                            │
+                └─────────────┬──────────────┘
+                              ▼
+                ┌─────────────────────────────┐
+                │ 🎯 Response Synthesizer     │
+                │ (Gemini 2.0 Flash)          │
+                │ De-duplicates + Cites       │
+                └──────────────┬──────────────┘
+                               │
+                               ▼
+                ┌─────────────────────────────┐
+                │ 📡 STREAMED RESPONSE → UI   │
+                └─────────────────────────────┘
+```
+
+### 🔄 Workflow Step-by-Step
+
+1. **Document Ingestion** → User uploads a PDF → app **chunks** the doc → generates embeddings via `text-embedding-004` → stores them in **ChromaDB**.
+2. **Query Entry** → User asks a question via Streamlit chat input.
+3. **Query Rewriting** → Conversational follow-ups like *"why is that?"* are converted into **standalone queries** using chat history.
+4. **Multi-Query Expansion** → Single query is **expanded into 5–6 diverse queries** to maximize retrieval coverage.
+5. **Intent Classification** → **Router Agent** decides: *factual lookup*, *reasoning*, *summary*, or *greeting* — and routes accordingly.
+6. **Hybrid Parallel Search** → For factual queries, both **ChromaDB** and **Google CSE** are queried **simultaneously via `asyncio`** → ~40% latency drop.
+7. **Response Synthesis** → All retrieved chunks are de-duplicated and passed to **Gemini 2.0 Flash** → outputs a **citation-grounded answer**.
+8. **Streaming Output** → Response is **token-streamed** back to the Streamlit UI in real-time.
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 🛠️ Tech Stack
 
 <div align="center">
 
 | Layer | Technology |
-|:---:|:---|
-| **🎨 Frontend** | `Streamlit` (real-time streaming UI) |
-| **🧠 Orchestration** | `LangGraph` (stateful multi-agent workflow) |
-| **🔗 Framework** | `LangChain` (agent tooling & chains) |
-| **🤖 LLM** | `Google Gemini 2.0 Flash` (response generation) |
-| **🔢 Embeddings** | `text-embedding-004` (Google Generative AI) |
-| **💾 Vector Store** | `ChromaDB` (persistent semantic search) |
-| **🌍 Web Search** | `Google Programmable Search Engine (CSE) API` |
-| **⚡ Concurrency** | `Python asyncio` (parallel retrieval) |
-| **📄 PDF Parsing** | `PyPDF` / `LangChain Document Loaders` |
-| **🔐 Config** | `python-dotenv` (secure credential management) |
+|:---|:---|
+| 🎨 **Frontend** | `Streamlit` — Real-time streaming UI |
+| 🧠 **Orchestration** | `LangGraph` — Stateful multi-agent workflow |
+| 🔗 **Framework** | `LangChain` — Agent tooling & chains |
+| 🤖 **LLM** | `Google Gemini 2.0 Flash` — Response generation |
+| 🔢 **Embeddings** | `text-embedding-004` (Google Generative AI) |
+| 💾 **Vector Store** | `ChromaDB` — Persistent semantic search |
+| 🌍 **Web Search** | `Google Programmable Search Engine (CSE) API` |
+| ⚡ **Concurrency** | `Python asyncio` — Parallel retrieval |
+| 📄 **PDF Parsing** | `PyPDF` / `LangChain Document Loaders` |
+| 🔐 **Config** | `python-dotenv` — Secure credential management |
 
 </div>
 
@@ -179,24 +226,28 @@ Our **LangGraph state machine** orchestrates **specialized agents** — each per
 
 | Agent | 🎯 Responsibility |
 |:---|:---|
-| **🔄 Query Rewriter Agent** | Transforms conversational follow-ups (e.g., *"why is that?"*) into **standalone, context-rich queries** using chat history. |
-| **🔀 Multi-Query Agent** | Expands a single user question into **5–6 diverse parallel queries** to maximize retrieval recall. |
-| **🧭 Router Agent** | The **brain** of the system — classifies user intent (factual, reasoning, greeting, summary) and dynamically routes execution. |
-| **📚 Vector DB Agent** | Performs **semantic similarity search** over the user's PDF embeddings stored in ChromaDB. |
-| **🌐 Web Search Agent** | Queries the **live web** via Google CSE for **up-to-date supplementary context**. |
-| **🎯 Response Synthesizer** | Aggregates, **de-duplicates**, and synthesizes context using Gemini → produces a **coherent, cited answer**. |
+| 🔄 **Query Rewriter Agent** | Transforms conversational follow-ups (e.g., *"why is that?"*) into **standalone, context-rich queries** using chat history. |
+| 🔀 **Multi-Query Agent** | Expands a single user question into **5–6 diverse parallel queries** to maximize retrieval recall. |
+| 🧭 **Router Agent** | The **brain** of the system — classifies user intent (factual, reasoning, greeting, summary) and dynamically routes execution. |
+| 📚 **Vector DB Agent** | Performs **semantic similarity search** over the user's PDF embeddings stored in ChromaDB. |
+| 🌐 **Web Search Agent** | Queries the **live web** via Google CSE for **up-to-date supplementary context**. |
+| 🎯 **Response Synthesizer** | Aggregates, **de-duplicates**, and synthesizes context using Gemini → produces a **coherent, cited answer**. |
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
 
 ## 🆚 Why VedaMate Stands Out
 
-| Feature | 📄 Standard PDF Readers | 🤖 Generic Chatbots (ChatGPT) | ⚡ Simple RAG | 🏆 **VedaMate** |
+| Feature | 📄 Standard PDF Readers | 🤖 Generic Chatbots | ⚡ Simple RAG | 🏆 **VedaMate** |
 |:---|:---:|:---:|:---:|:---:|
 | **Semantic Search** | ❌ | ✅ | ✅ | ✅ |
 | **Document-Grounded Answers** | ❌ | ❌ | ✅ | ✅ |
-| **Real-Time Web Augmentation** | ❌ | ⚠️ Limited | ❌ | ✅ |
+| **Real-Time Web Augmentation** | ❌ | ⚠️ | ❌ | ✅ |
 | **Multi-Agent Reasoning** | ❌ | ❌ | ❌ | ✅ |
 | **Intent-Based Routing** | ❌ | ❌ | ❌ | ✅ |
 | **Async Parallel Retrieval** | ❌ | ❌ | ❌ | ✅ |
-| **Citation Transparency** | ❌ | ❌ | ⚠️ Partial | ✅ |
+| **Citation Transparency** | ❌ | ❌ | ⚠️ | ✅ |
 | **Hallucination Resistance** | N/A | ❌ | ⚠️ | ✅ |
 
 <div align="center">
@@ -216,127 +267,243 @@ Our **LangGraph state machine** orchestrates **specialized agents** — each per
 ```bash
 git clone https://github.com/ameer2402/VedaMate.git
 cd VedaMate
-2️⃣ Create & Activate a Virtual Environment
-💡 Strongly recommended to isolate dependencies.
+```
 
-🍎 macOS / 🐧 Linux:
+### 2️⃣ Create & Activate a Virtual Environment
 
-bash
+> 💡 Strongly recommended to isolate dependencies.
+
+**🍎 macOS / 🐧 Linux:**
+
+```bash
 python3 -m venv venv
 source venv/bin/activate
-🪟 Windows:
+```
 
-bash
+**🪟 Windows:**
+
+```bash
 python -m venv venv
 .\venv\Scripts\activate
-3️⃣ Install Dependencies
-bash
-pip install -r requirements.txt
-4️⃣ Configure Environment Variables (.env)
-⚠️ Critical Step — The app will not run without valid Google API credentials.
+```
 
-🅰️ Create .env in the project root
-bash
+### 3️⃣ Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4️⃣ Configure Environment Variables (`.env`)
+
+> ⚠️ **Critical Step** — The app will not run without valid Google API credentials.
+
+#### 🅰️ Create `.env` in the project root
+
+```bash
 touch .env
-🅱️ Add the following template:
-env
+```
+
+#### 🅱️ Add the following template:
+
+```env
 # ====== Google AI Services (Gemini + Embeddings) ======
 GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY_HERE"
 
 # ====== Google Programmable Search Engine ID ======
 GOOGLE_CSE_ID="YOUR_GOOGLE_CSE_ID_HERE"
-🅲 Obtain Your Credentials
-🔐 Pro Tip: Use a personal Gmail account in an Incognito window. Corporate/school accounts often block required APIs due to org policies.
-
-🔑 Step A: Create Google Cloud Project & API Key
-Visit the Google Cloud Console
-Create a New Project
-Enable the following APIs:
-✅ Generative Language API
-✅ Custom Search API
-Navigate to APIs & Services → Credentials
-Click ➕ CREATE CREDENTIALS → API key
-Copy the key → paste as GOOGLE_API_KEY
-🔍 Step B: Get Programmable Search Engine ID
-Visit the Programmable Search Engine Control Panel
-Click Add to create a new search engine
-Toggle ON ➡️ "Search the entire web"
-After creation, copy the Search Engine ID
-Paste as GOOGLE_CSE_ID
-5️⃣ Run the Application 🚀
-bash
-streamlit run app.py
-🌐 Your browser will automatically open at http://localhost:8501
-
-
-🎮 How to Use
-1️⃣
-📤 Upload a PDF
-Use the sidebar file uploader. The app will chunk, embed, and index it automatically into ChromaDB.
-2️⃣
-📂 Select a Document
-Pick the indexed document from the sidebar dropdown to set it as the active knowledge base.
-3️⃣
-💬 Start Chatting
-Type questions in the chat input. Watch the multi-agent workflow deliver streamed, citation-backed responses.
-4️⃣
-✨ Use Smart Suggestions
-Click AI-generated follow-up questions to dive deeper.
-
-⌨️ Keyboard Shortcuts:
-• ↑ / ↓ — Navigate chat turns
-• Enter — Jump to selected turn
-• Esc — Return to chat input
-
-📊 Performance & Impact Metrics
-Metric	Improvement
-🎯 Answer Relevance	⬆️ +50% vs. baseline RAG
-🚫 Hallucination Reduction	⬇️ -30%
-⚡ Latency Reduction	⬇️ -40% via async parallel retrieval
-💰 Token Optimization	⬇️ -25% via intent classification
-📚 Document Capacity	📄 200+ pages per upload
-🤖 Active Agents	🧠 6+ specialized agents
-🌍 Real-World Impact
-👤 User Persona	💎 Value Delivered
-🎓 Students	Save dozens of hours; instant clarification; deeper understanding; better grades
-🔬 Researchers	Rapidly digest dense academic papers; cross-reference with web context
-⚖️ Legal Professionals	Query lengthy contracts/case files semantically; extract key clauses fast
-📊 Analysts	Parse technical reports, financial filings, compliance docs in minutes
-👨‍🏫 Educators	Build interactive course companions for students
-
-🗺️ Roadmap
- 🧪 Multi-PDF Cross-Document Search (knowledge graph fusion)
- 🎙️ Voice Input / Speech-to-Text integration
- 🌐 Multilingual Support (Hindi, Telugu, Spanish, etc.)
- 📊 Auto-Generated Quizzes & Flashcards per topic module
- 🔁 Conversation Memory Persistence (Redis-backed)
- 🐳 Docker Containerization + One-click cloud deploy
- 🔐 Multi-User Authentication with role-based access
- 📈 Analytics Dashboard (query patterns, accuracy metrics)
-🤝 Contributing
-Contributions are welcome and appreciated! 🎉
-
-🍴 Fork the repository
-🌿 Create a feature branch (git checkout -b feature/AmazingFeature)
-✅ Commit your changes (git commit -m 'Add some AmazingFeature')
-🚀 Push to the branch (git push origin feature/AmazingFeature)
-🎁 Open a Pull Request
-📜 License
-Distributed under the MIT License. See LICENSE for more details.
-
-👨‍💻 Author
-Mohammed Ameer Khan
-Full Stack Software Engineer • Ex-Google Apprentice • AI Builder
-
-
-
-🏆 Acknowledgments
-🎯 Google AI India Hackathon 2025 — Onsite showcase platform
-🤖 Google Generative AI Team — for Gemini & embedding models
-🦜 LangChain & LangGraph — for the agentic framework
-🧠 ChromaDB — for the lightning-fast vector store
-🎨 Streamlit — for the elegant UI framework
-
-⭐ If VedaMate helped you learn smarter, drop a star! It motivates further development. 🚀
-
 ```
+
+#### 🅲 Obtain Your Credentials
+
+> 🔐 **Pro Tip:** Use a **personal Gmail account** in an **Incognito window**. Corporate/school accounts often block required APIs due to org policies.
+
+##### 🔑 Step A: Create Google Cloud Project & API Key
+
+1. Visit the [Google Cloud Console](https://console.cloud.google.com/)
+2. **Create a New Project**
+3. **Enable** the following APIs:
+   - ✅ Generative Language API
+   - ✅ Custom Search API
+4. Navigate to **APIs & Services → Credentials**
+5. Click **➕ CREATE CREDENTIALS → API key**
+6. Copy the key → paste as `GOOGLE_API_KEY`
+
+##### 🔍 Step B: Get Programmable Search Engine ID
+
+1. Visit the [Programmable Search Engine Control Panel](https://programmablesearchengine.google.com/)
+2. Click **Add** to create a new search engine
+3. **Toggle ON** ➡️ *"Search the entire web"*
+4. After creation, copy the **Search Engine ID**
+5. Paste as `GOOGLE_CSE_ID`
+
+### 5️⃣ Run the Application 🚀
+
+```bash
+streamlit run app.py
+```
+
+> 🌐 Your browser will automatically open at `http://localhost:8501`
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 🎮 How to Use
+
+<table>
+  <tr>
+    <td width="80px" align="center"><h2>1️⃣</h2></td>
+    <td>
+      <b>📤 Upload a PDF</b><br/>
+      Use the sidebar file uploader. The app will <b>chunk, embed, and index</b> it automatically into ChromaDB.
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><h2>2️⃣</h2></td>
+    <td>
+      <b>📂 Select a Document</b><br/>
+      Pick the indexed document from the sidebar dropdown to set it as the active knowledge base.
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><h2>3️⃣</h2></td>
+    <td>
+      <b>💬 Start Chatting</b><br/>
+      Type questions in the chat input. Watch the multi-agent workflow deliver streamed, citation-backed responses.
+    </td>
+  </tr>
+  <tr>
+    <td align="center"><h2>4️⃣</h2></td>
+    <td>
+      <b>✨ Use Smart Suggestions</b><br/>
+      Click AI-generated follow-up questions to dive deeper.<br/><br/>
+      ⌨️ <b>Keyboard Shortcuts:</b><br/>
+      • <kbd>↑</kbd> / <kbd>↓</kbd> — Navigate chat turns<br/>
+      • <kbd>Enter</kbd> — Jump to selected turn<br/>
+      • <kbd>Esc</kbd> — Return to chat input
+    </td>
+  </tr>
+</table>
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 📊 Performance Metrics
+
+<div align="center">
+
+| Metric | Improvement |
+|:---|:---:|
+| 🎯 **Answer Relevance** | ⬆️ **+50%** vs. baseline RAG |
+| 🚫 **Hallucination Reduction** | ⬇️ **−30%** |
+| ⚡ **Latency Reduction** | ⬇️ **−40%** via async parallel retrieval |
+| 💰 **Token Optimization** | ⬇️ **−25%** via intent classification |
+| 📚 **Document Capacity** | 📄 **200+ pages** per upload |
+| 🤖 **Active Agents** | 🧠 **6+ specialized agents** |
+
+</div>
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 🌍 Real-World Impact
+
+| 👤 User Persona | 💎 Value Delivered |
+|:---|:---|
+| 🎓 **Students** | Save dozens of hours; instant clarification; deeper understanding; better grades |
+| 🔬 **Researchers** | Rapidly digest dense academic papers; cross-reference with web context |
+| ⚖️ **Legal Professionals** | Query lengthy contracts/case files semantically; extract key clauses fast |
+| 📊 **Analysts** | Parse technical reports, financial filings, compliance docs in minutes |
+| 👨‍🏫 **Educators** | Build interactive course companions for students |
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 🗺️ Roadmap
+
+- [ ] 🧪 **Multi-PDF Cross-Document Search** (knowledge graph fusion)
+- [ ] 🎙️ **Voice Input / Speech-to-Text** integration
+- [ ] 🌐 **Multilingual Support** (Hindi, Telugu, Spanish, etc.)
+- [ ] 📊 **Auto-Generated Quizzes & Flashcards** per topic module
+- [ ] 🔁 **Conversation Memory Persistence** (Redis-backed)
+- [ ] 🐳 **Docker Containerization** + One-click cloud deploy
+- [ ] 🔐 **Multi-User Authentication** with role-based access
+- [ ] 📈 **Analytics Dashboard** (query patterns, accuracy metrics)
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 🤝 Contributing
+
+Contributions are **welcome and appreciated!** 🎉
+
+1. 🍴 Fork the repository
+2. 🌿 Create a feature branch — `git checkout -b feature/AmazingFeature`
+3. ✅ Commit your changes — `git commit -m 'Add some AmazingFeature'`
+4. 🚀 Push to the branch — `git push origin feature/AmazingFeature`
+5. 🎁 Open a **Pull Request**
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 📜 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more details.
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 👨‍💻 Author
+
+<div align="center">
+
+### **Mohammed Ameer Khan**
+
+*Full Stack Software Engineer • Ex-Google Apprentice • AI Builder*
+
+<p>
+  <a href="https://www.linkedin.com/in/mohammed-ameerkhan-22368626a/">
+    <img src="https://img.shields.io/badge/LinkedIn-CONNECT-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=000000"/>
+  </a>
+  <a href="mailto:ameerkhan20241a0497@gmail.com">
+    <img src="https://img.shields.io/badge/Email-REACH%20OUT-D14836?style=for-the-badge&logo=gmail&logoColor=white&labelColor=000000"/>
+  </a>
+  <a href="https://github.com/ameer2402">
+    <img src="https://img.shields.io/badge/GitHub-FOLLOW-181717?style=for-the-badge&logo=github&logoColor=white&labelColor=000000"/>
+  </a>
+  <a href="https://portfolio-frontend-rho-blond.vercel.app/">
+    <img src="https://img.shields.io/badge/Portfolio-EXPLORE-FF5722?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=000000"/>
+  </a>
+</p>
+
+</div>
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+## 🏆 Acknowledgments
+
+- 🎯 **Google AI India Hackathon 2025** — Onsite showcase platform
+- 🤖 **Google Generative AI Team** — for Gemini & embedding models
+- 🦜 **LangChain & LangGraph** — for the agentic framework
+- 🧠 **ChromaDB** — for the lightning-fast vector store
+- 🎨 **Streamlit** — for the elegant UI framework
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="100%"/>
+</div>
+
+<div align="center">
+
+### ⭐ If VedaMate helped you learn smarter, **drop a star!** It motivates further development. 🚀
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:f093fb,50:764ba2,100:667eea&height=140&section=footer&text=Built%20with%20❤️%20by%20Ameer%20Khan&fontSize=22&fontColor=ffffff&animation=twinkling&fontAlignY=70"/>
+
+</div>
