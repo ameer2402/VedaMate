@@ -7,6 +7,19 @@ import AISummaryTab from './components/AISummaryTab';
 import ChatTab, { renderMarkdown } from './components/ChatTab';
 import QuizTab from './components/QuizTab';
 
+// Dynamic API Base URL configuration for local vs production
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? ''
+  : 'https://vedamate-backend.onrender.com';
+
+const originalFetch = window.fetch;
+window.fetch = function (url, options) {
+  if (typeof url === 'string' && url.startsWith('/api')) {
+    url = API_BASE_URL + url;
+  }
+  return originalFetch(url, options);
+};
+
 export default function App() {
   // Session / Navigation States
   const [profile, setProfile] = useState(null);
