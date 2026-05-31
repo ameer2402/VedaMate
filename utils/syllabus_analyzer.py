@@ -16,12 +16,15 @@ def extract_intro_text(pdf_path: str, max_pages: int = 15) -> str:
             if page_text:
                 text += page_text + "\n"
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"Error reading PDF: {e}")
     return text
 
 def analyze_syllabus(pdf_path: str, user_syllabus: str = "") -> list:
     text = extract_intro_text(pdf_path)
     if not text.strip():
+        print("--- SYLLABUS ANALYZER WARNING: No selectable text extracted from PDF ---")
         return ["General Overview"]
     
     llm = ChatGoogleGenerativeAI(
@@ -47,6 +50,8 @@ def analyze_syllabus(pdf_path: str, user_syllabus: str = "") -> list:
         if isinstance(syllabus, list):
             return syllabus
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"Failed to generate syllabus: {e}")
     
     return ["General Overview"]
