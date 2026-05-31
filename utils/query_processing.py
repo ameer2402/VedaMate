@@ -1,5 +1,5 @@
 from langchain_community.chat_models import ChatOllama
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from .config import LOCAL_LLM_MODEL, COMBINED_PROMPT_TEMPLATE
 
 def process_query_with_llm(state):

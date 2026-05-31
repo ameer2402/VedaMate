@@ -1,7 +1,7 @@
 # agents/result_processing_agent.py (Corrected)
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate
 from models.agent_state import AgentState
 from utils.config import GEMINI_MODEL_NAME, COMBINED_PROMPT_TEMPLATE
 
