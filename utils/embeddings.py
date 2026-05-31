@@ -1,15 +1,13 @@
-from langchain_huggingface import HuggingFaceEmbeddings
-from .config import EMBEDDING_MODEL_NAME
+import os
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
 def get_embedding_function():
     """
-    Initializes and returns a sentence-transformer model for creating embeddings locally.
-    Runs on the CPU to completely bypass any API rate limits.
+    Initializes and returns a Google Generative AI model for creating embeddings.
+    Consumes 0MB of local RAM, making it compatible with free-tier hosting.
     """
-    model_kwargs = {'device': 'cpu'}
-    encode_kwargs = {'normalize_embeddings': False}
-    return HuggingFaceEmbeddings(
-        model_name=EMBEDDING_MODEL_NAME,
-        model_kwargs=model_kwargs,
-        encode_kwargs=encode_kwargs
+    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+    return GoogleGenerativeAIEmbeddings(
+        model="models/text-embedding-004",
+        google_api_key=api_key
     )
