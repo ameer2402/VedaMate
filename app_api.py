@@ -10,6 +10,10 @@ from dotenv import load_dotenv
 # Load environment variables from .env file using absolute path
 load_dotenv(os.path.join(os.path.dirname(__file__), '.env'), override=True)
 
+# Align GEMINI_API_KEY with GOOGLE_API_KEY for LangChain Google GenAI integration
+if not os.getenv("GOOGLE_API_KEY") and os.getenv("GEMINI_API_KEY"):
+    os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
+
 from utils.config import PDF_STORAGE_PATH
 from utils.vector_db_utils import process_and_store_pdf, query_vector_db
 from utils.metadata_manager import load_metadata, save_metadata
