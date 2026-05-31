@@ -638,6 +638,17 @@ export default function App() {
                 onCancel={() => setEditingProfile(false)} 
               />
             </div>
+          ) : processingPdf ? (
+            /* STATE A: Processing Loader */
+            <div style={{ display: 'flex', height: '60vh', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px' }}>
+                <RefreshCw size={36} className="skeleton" style={{ animation: 'spin 2s linear infinite', margin: '0 auto' }} />
+                <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>Ingesting Textbook...</h3>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
+                  Analyzing and structuring chapters for <strong>{processingPdf}</strong>. This compiles vector database indexes and syllabus alignments.
+                </p>
+              </div>
+            </div>
           ) : showUploadForm ? (
             /* STATE C: Show file upload Form */
             <div style={{ maxWidth: '700px', margin: '0 auto', width: '100%' }}>
@@ -691,19 +702,7 @@ export default function App() {
               </form>
             </div>
           ) : selectedPdf ? (
-            processingPdf ? (
-
-              /* STATE A: Processing Loader */
-              <div style={{ display: 'flex', height: '60vh', justifyContent: 'center', alignItems: 'center' }}>
-                <div style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '400px' }}>
-                  <RefreshCw size={36} className="skeleton" style={{ animation: 'spin 2s linear infinite', margin: '0 auto' }} />
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: '800' }}>Ingesting Textbook...</h3>
-                  <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', lineHeight: 1.5 }}>
-                    Analyzing and structuring chapters for <strong>{processingPdf}</strong>. This compiles vector database indexes and syllabus alignments.
-                  </p>
-                </div>
-              </div>
-            ) : !selectedTopic ? (
+            !selectedTopic ? (
               /* STATE E: Textbook selected, but no chapter selected yet */
               <div style={{ display: 'flex', flexDirection: 'column', gap: '28px', animation: 'fadeIn 0.4s ease-out' }}>
                 <div>
