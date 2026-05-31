@@ -1,6 +1,6 @@
 from typing import List
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.schema.document import Document
+from langchain_core.documents import Document
 from .config import PDF_CHUNK_SIZE, PDF_CHUNK_OVERLAP
 import logging
 from pypdf import PdfReader
