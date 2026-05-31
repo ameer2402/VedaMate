@@ -7,6 +7,7 @@ chromadb>=0.5.3
 # LangChain core components
 langchain>=0.2.5
 langgraph>=0.0.65
+langchain-text-splitters>=0.2.0
 
 # Google AI libraries (direct and wrappers)
 google-generativeai>=0.7.1
