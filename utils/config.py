@@ -9,6 +9,26 @@ METADATA_STORAGE_PATH = os.path.join(os.path.dirname(__file__), '..', 'metadata'
 GEMINI_MODEL_NAME = "models/gemini-3.1-flash-lite"
 GOOGLE_EMBEDDING_MODEL_NAME = "models/gemini-embedding-2"
 
+def safe_get_content(content) -> str:
+    """
+    Safely converts LLM response content to a clean string, handling list of dicts/strings if returned by the API.
+    """
+    if hasattr(content, "content"):
+        content = content.content
+    if isinstance(content, list):
+        parts = []
+        for part in content:
+            if isinstance(part, str):
+                parts.append(part)
+            elif isinstance(part, dict) and "text" in part:
+                parts.append(part["text"])
+            else:
+                parts.append(str(part))
+        content = "".join(parts)
+    elif content is None:
+        return ""
+    return str(content)
+
 # --- Vector DB Configuration ---
 EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 TOP_K = 7

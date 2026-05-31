@@ -3,7 +3,7 @@ import json
 import re
 from pypdf import PdfReader
 from langchain_google_genai import ChatGoogleGenerativeAI
-from utils.config import SYLLABUS_GENERATION_PROMPT, GEMINI_MODEL_NAME
+from utils.config import SYLLABUS_GENERATION_PROMPT, GEMINI_MODEL_NAME, safe_get_content
 
 def extract_intro_text(pdf_path: str, max_pages: int = 15) -> str:
     text = ""
@@ -66,7 +66,7 @@ Based on the filename "{filename}" and any custom syllabus topics provided by th
 """
         try:
             response = llm.invoke(fallback_prompt)
-            content = response.content.strip()
+            content = safe_get_content(response.content).strip()
             content = re.sub(r'```json\s*', '', content)
             content = re.sub(r'```\s*', '', content)
             match = re.search(r'\[\s*.*?\s*\]', content, re.DOTALL)
@@ -90,7 +90,7 @@ Based on the filename "{filename}" and any custom syllabus topics provided by th
     
     try:
         response = llm.invoke(prompt)
-        content = response.content.strip()
+        content = safe_get_content(response.content).strip()
         
         # Clean markdown if present
         content = re.sub(r'```json\s*', '', content)
