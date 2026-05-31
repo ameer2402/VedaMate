@@ -46,6 +46,11 @@ def analyze_syllabus(pdf_path: str, user_syllabus: str = "") -> list:
         content = re.sub(r'```json\s*', '', content)
         content = re.sub(r'```\s*', '', content)
         
+        # Robust JSON Array extractor (finds the outermost brackets)
+        match = re.search(r'\[\s*.*?\s*\]', content, re.DOTALL)
+        if match:
+            content = match.group(0)
+        
         syllabus = json.loads(content)
         if isinstance(syllabus, list):
             return syllabus
