@@ -29,7 +29,10 @@ def process_and_store_pdf(pdf_path: str, collection_name: str):
         filename = os.path.basename(pdf_path)
         chunks = process_pdf(pdf_path, filename)
         if not chunks:
-            return
+            raise ValueError(
+                "No readable text content could be extracted from the PDF. "
+                "The file may be scanned, image-only, or copy-protected."
+            )
 
         texts = [chunk.page_content for chunk in chunks]
         embeddings = embedding_function_instance.embed_documents(texts)
