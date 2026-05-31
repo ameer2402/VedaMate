@@ -19,9 +19,14 @@ def question_generator_agent(state: AgentState) -> AgentState:
     prompt = ChatPromptTemplate.from_template(QUESTION_GENERATION_PROMPT_TEMPLATE)
     chain = prompt | llm
     
+    persona_dict = state.get("persona", {})
+    persona_str = f"Education Level: {persona_dict.get('education_level', 'Not specified')}\\nInterests: {persona_dict.get('interests', 'Not specified')}"
+
     response_content = chain.invoke({
-        "question": state.get("rewritten_query", state["query"]),
-        "professor_context": state.get("vector_db_context", "")
+        "question": state.get("rewritten_query") or state["query"],
+        "professor_context": state.get("vector_db_context", ""),
+        "persona_context": persona_str,
+        "topic_context": state.get("current_topic", "General Topic")
     }).content
 
     state["final_answer"] = response_content

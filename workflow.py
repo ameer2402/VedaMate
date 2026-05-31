@@ -10,21 +10,30 @@ from agents.web_search_agent import web_search_agent
 from agents.reasoning_agent import reasoning_agent
 from agents.result_processing_agent import factual_rag_agent
 from agents.greeting_agent import greeting_agent
-from agents.question_generator_agent import question_generator_agent # IMPORT new agent
+from agents.question_generator_agent import question_generator_agent
+from agents.question_answering_agent import question_answering_agent
+from agents.quiz_agent import quiz_agent
 from typing import Optional, List, Dict
 
-# This function reads the router's decision from the state and directs the workflow
-def should_continue(state: AgentState) -> str:
-    if state["query_type"] == "greeting":
+def route_from_router(state: AgentState) -> str:
+    if state.get("mode") == "quiz":
+        return "process_path"
+    if state["query_type"] in ["greeting", "general"]:
         return "greeting_path"
-    elif state["query_type"] == "question_generation":
+    return "process_path"
+
+def route_from_processor(state: AgentState) -> str:
+    if state.get("mode") == "quiz":
+        return "quiz_path"
+    if state["query_type"] == "question_generation":
         return "question_generation_path"
     elif state["query_type"] == "reasoning":
         return "reasoning_path"
+    elif state["query_type"] == "question_answering":
+        return "question_answering_path"
     else:
         return "factual_path"
 
-# Helper function to run searches in parallel for the factual path
 async def parallel_search(state: AgentState) -> AgentState:
     vector_db_task = asyncio.create_task(vector_db_agent(state))
     web_search_task = asyncio.create_task(web_search_agent(state))
@@ -33,15 +42,10 @@ async def parallel_search(state: AgentState) -> AgentState:
     state.update(web_search_result)
     return state
 
-# Helper function to only retrieve PDF context for reasoning/generation paths
 async def get_pdf_context_only(state: AgentState) -> AgentState:
     return await vector_db_agent(state)
 
-# --- WORKFLOW DEFINITION ---
 def create_workflow():
-    """
-    Creates the main LangGraph agent workflow with four distinct paths.
-    """
     workflow = StateGraph(AgentState)
 
     # --- Define the Nodes ---
@@ -50,68 +54,118 @@ def create_workflow():
     workflow.add_node("query_processor", query_processing_agent)
     workflow.add_node("router", router_agent)
     workflow.add_node("greeting_responder", greeting_agent)
-    workflow.add_node("question_generator", question_generator_agent) # NEW node
+    workflow.add_node("question_generator", question_generator_agent)
+    workflow.add_node("question_answering_responder", question_answering_agent)
+    workflow.add_node("quiz_responder", quiz_agent)
     
-    # Factual Path Nodes
     workflow.add_node("parallel_searcher", parallel_search)
     workflow.add_node("factual_rag_responder", factual_rag_agent)
 
-    # Reasoning/Generation Path Nodes
     workflow.add_node("pdf_context_retriever", get_pdf_context_only)
     workflow.add_node("reasoning_responder", reasoning_agent) 
     
     # --- Define the Edges ---
-    workflow.set_entry_point("query_rewriter")
-    workflow.add_edge("query_rewriter", "multi_query_generator")
-    workflow.add_edge("multi_query_generator", "query_processor")
-    workflow.add_edge("query_processor", "router")
+    workflow.set_entry_point("router")
 
-    # This is the conditional branch that directs the flow based on the router's decision.
     workflow.add_conditional_edges(
         "router",
-        should_continue,
+        route_from_router,
+        {
+            "greeting_path": "greeting_responder",
+            "process_path": "query_rewriter",
+        },
+    )
+
+    workflow.add_edge("query_rewriter", "multi_query_generator")
+    workflow.add_edge("multi_query_generator", "query_processor")
+
+    workflow.add_conditional_edges(
+        "query_processor",
+        route_from_processor,
         {
             "factual_path": "parallel_searcher",
             "reasoning_path": "pdf_context_retriever",
-            "question_generation_path": "pdf_context_retriever", # Reuse the same retriever
-            "greeting_path": "greeting_responder",
+            "question_generation_path": "pdf_context_retriever",
+            "question_answering_path": "parallel_searcher",
+            "quiz_path": "pdf_context_retriever",
         },
     )
     
-    # Conditional branch from the context retriever to the correct agent
     workflow.add_conditional_edges(
         "pdf_context_retriever",
-        # A simple lambda function to check the query type again
-        lambda state: "reasoning" if state["query_type"] == "reasoning" else "question_generation",
+        lambda state: "quiz" if state.get("mode") == "quiz" else ("reasoning" if state["query_type"] == "reasoning" else "question_generation"),
         {
+            "quiz": "quiz_responder",
             "reasoning": "reasoning_responder",
             "question_generation": "question_generator"
         }
     )
 
-    # Connect the end of each path to the final END node.
-    workflow.add_edge("parallel_searcher", "factual_rag_responder")
+    workflow.add_conditional_edges(
+        "parallel_searcher",
+        lambda state: "question_answering" if state["query_type"] == "question_answering" else "factual",
+        {
+            "factual": "factual_rag_responder",
+            "question_answering": "question_answering_responder"
+        }
+    )
+
     workflow.add_edge("factual_rag_responder", END)
+    workflow.add_edge("question_answering_responder", END)
     workflow.add_edge("reasoning_responder", END)
     workflow.add_edge("question_generator", END)
     workflow.add_edge("greeting_responder", END)
-
-    # Compile the graph into a runnable application.
+    workflow.add_edge("quiz_responder", END)
     return workflow.compile()
 
-# Create a single, compiled instance of the workflow to be used by the app.
 app_workflow = create_workflow()
 
+from utils.vector_db_utils import get_semantic_cache, set_semantic_cache
+
 async def multi_agent_query(
-    query_text: str, pdf_context_name: str, chat_history: List[Dict[str, str]]
+    query_text: str, pdf_context_name: str, chat_history: List[Dict[str, str]],
+    persona: Dict[str, str] = None, current_topic: str = "General Overview", mode: str = "chat"
 ) -> Dict[str, any]:
-    """
-    Invokes the agent workflow and returns the final answer and suggested questions.
-    """
-    initial_state = create_initial_state(query_text, pdf_context_name, chat_history)
+    if persona is None:
+        persona = {}
+        
+    # Apply Semantic Caching if in chat mode
+    if mode == "chat":
+        cached = get_semantic_cache(query_text, pdf_context_name)
+        if cached:
+            print("--- SEMANTIC CACHE HIT ---")
+            return cached
+
+    initial_state = create_initial_state(query_text, pdf_context_name, chat_history, persona, current_topic, mode)
     final_state = await app_workflow.ainvoke(initial_state)
     
+    # Parse citation snippets
+    citation_snippets = {}
+    vector_db_context = final_state.get("vector_db_context", "")
+    if vector_db_context:
+        for block in vector_db_context.split("\n\n---\n\n"):
+            if "Source Page: " in block and "Content: " in block:
+                try:
+                    parts = block.split("Content: ", 1)
+                    header = parts[0].strip()
+                    content = parts[1].strip()
+                    page_num = header.replace("Source Page: ", "").strip()
+                    if page_num not in citation_snippets:
+                        citation_snippets[page_num] = []
+                    if content not in citation_snippets[page_num]:
+                        citation_snippets[page_num].append(content)
+                except Exception:
+                    pass
+
+    answer = final_state.get("final_answer", "Sorry, an error occurred and I could not generate a response.")
+    suggestions = final_state.get("suggested_questions", [])
+    
+    # Cache the result
+    if mode == "chat":
+        set_semantic_cache(query_text, answer, suggestions, citation_snippets, pdf_context_name)
+        
     return {
-        "answer": final_state.get("final_answer", "Sorry, an error occurred and I could not generate a response."),
-        "suggestions": final_state.get("suggested_questions", [])
+        "answer": answer,
+        "suggestions": suggestions,
+        "citation_snippets": citation_snippets
     }

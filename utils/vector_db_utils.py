@@ -39,10 +39,18 @@ def process_and_store_pdf(pdf_path: str, collection_name: str):
 async def query_vector_db(query_text: str, collection_name: str) -> Dict[str, Any]:
     """
     Queries ChromaDB and returns a structured context string with explicit page numbers for citation.
+    Applies Query Expansion to optimize vector similarity retrieval.
     """
     try:
         collection = client.get_collection(name=collection_name)
-        query_embedding = embedding_function_instance.embed_query(query_text)
+        
+        # Apply Query Expansion: Append semantic descriptors if it's a short query
+        search_query = query_text
+        if len(query_text.split()) <= 6:
+            search_query = f"{query_text} core concepts definitions process explanation overview details examples"
+            logging.info(f"Query Expanded: '{query_text}' -> '{search_query}'")
+            
+        query_embedding = embedding_function_instance.embed_query(search_query)
         results = collection.query(query_embeddings=[query_embedding], n_results=TOP_K)
 
         documents = results.get("documents", [[]])[0]
@@ -65,3 +73,57 @@ async def query_vector_db(query_text: str, collection_name: str) -> Dict[str, An
     except Exception as e:
         logging.error(f"Failed to query ChromaDB collection '{collection_name}': {e}")
         return {"context_text": "", "sources": []}
+
+def get_semantic_cache(query_text: str, pdf_context_name: str) -> dict:
+    """
+    Checks if a semantically similar query exists in the ChromaDB cache.
+    Returns the cached response and suggestions if found.
+    """
+    try:
+        cache_collection = client.get_or_create_collection(name=f"{pdf_context_name}_semantic_cache")
+        # Ensure we have items before query
+        if cache_collection.count() == 0:
+            return None
+            
+        query_embedding = embedding_function_instance.embed_query(query_text)
+        results = cache_collection.query(query_embeddings=[query_embedding], n_results=1)
+        
+        distances = results.get("distances", [[]])[0]
+        metadatas = results.get("metadatas", [[]])[0]
+        
+        if distances and distances[0] <= 0.12: # Threshold for semantic similarity
+            meta = metadatas[0]
+            import json
+            return {
+                "answer": meta.get("answer"),
+                "suggestions": json.loads(meta.get("suggestions_json", "[]")),
+                "citation_snippets": json.loads(meta.get("citation_snippets_json", "{}"))
+            }
+    except Exception as e:
+        logging.error(f"Semantic cache retrieval failed: {e}")
+    return None
+
+def set_semantic_cache(query_text: str, answer: str, suggestions: list, citation_snippets: dict, pdf_context_name: str):
+    """
+    Saves a query, its generated answer, suggestions, and citation snippets to the ChromaDB cache.
+    """
+    try:
+        cache_collection = client.get_or_create_collection(name=f"{pdf_context_name}_semantic_cache")
+        import hashlib
+        import json
+        query_id = hashlib.sha256(query_text.encode("utf-8")).hexdigest()
+        query_embedding = embedding_function_instance.embed_query(query_text)
+        
+        cache_collection.upsert(
+            ids=[query_id],
+            embeddings=[query_embedding],
+            documents=[query_text],
+            metadatas=[{
+                "answer": answer,
+                "suggestions_json": json.dumps(suggestions),
+                "citation_snippets_json": json.dumps(citation_snippets)
+            }]
+        )
+        logging.info(f"Cached query '{query_text}' in '{pdf_context_name}_semantic_cache'")
+    except Exception as e:
+        logging.error(f"Failed to cache query: {e}")

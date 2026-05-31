@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environments
+venv/
+env/
+.env
+.env.local
+.env.*.local
+
+# Databases and Local Storage
+chroma_db/
+student_pdfs/
+metadata/
+*.db
+
+# Frontend build outputs and dependencies
+node_modules/
+dist/
+.eslintcache
+
+# OS Files
+.DS_Store
+Thumbs.db

@@ -12,3 +12,9 @@ langgraph>=0.0.65
 google-generativeai>=0.7.1
 google-api-python-client>=2.135.0
 langchain-google-genai>=1.0.6
+
+# API and Database dependencies
+fastapi>=0.110.0
+uvicorn>=0.28.0
+sqlalchemy>=2.0.28
+psycopg2-binary>=2.9.9

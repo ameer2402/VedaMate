@@ -5,6 +5,9 @@ class AgentState(TypedDict):
     query: str
     pdf_context_name: str
     chat_history: Optional[List[Dict[str, str]]]
+    persona: Dict[str, str]
+    current_topic: str
+    mode: str
 
     # --- State variables ---
     query_type: str
@@ -20,12 +23,16 @@ class AgentState(TypedDict):
     suggested_questions: Optional[List[str]]
 
 def create_initial_state(
-    query: str, pdf_context_name: str, chat_history: List[Dict[str, str]]
+    query: str, pdf_context_name: str, chat_history: List[Dict[str, str]],
+    persona: Dict[str, str], current_topic: str, mode: str
 ) -> AgentState:
     return AgentState(
         query=query,
         pdf_context_name=pdf_context_name,
         chat_history=chat_history,
+        persona=persona,
+        current_topic=current_topic,
+        mode=mode,
         query_type="",
         detail_instruction="",
         rewritten_query=None,
