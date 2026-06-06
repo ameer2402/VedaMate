@@ -137,51 +137,313 @@ function MermaidRenderer({ chartCode, onNodeClick }) {
   );
 }
 
-function renderMarkdown(text) {
-  if (!text) return null;
+function parseInlineMarkdown(text) {
+  if (!text) return "";
   
-  return text.split('\n').map((line, i) => {
-    let trimmed = line.trim();
-    if (/^([-*_])\1\1+$/.test(trimmed) || trimmed === '---' || trimmed === '--') {
-      return <hr key={i} style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '20px 0', opacity: 0.5 }} />;
+  let parts = [text];
+  
+  // 1. Inline code: `code`
+  parts = parts.flatMap(part => {
+    if (typeof part !== 'string') return part;
+    const regex = /`([^`]+)`/g;
+    const subParts = [];
+    let lastIdx = 0;
+    let match;
+    while ((match = regex.exec(part)) !== null) {
+      if (match.index > lastIdx) {
+        subParts.push(part.substring(lastIdx, match.index));
+      }
+      subParts.push(
+        <code key={match.index} style={{
+          background: 'rgba(99, 102, 241, 0.1)',
+          color: '#a78bfa',
+          padding: '2px 6px',
+          borderRadius: '4px',
+          fontFamily: 'monospace',
+          fontSize: '0.85em',
+          border: '1px solid rgba(139, 92, 246, 0.2)'
+        }}>
+          {match[1]}
+        </code>
+      );
+      lastIdx = regex.lastIndex;
     }
-    if (trimmed.startsWith('###')) {
-      return <h4 key={i} style={{ margin: '20px 0 10px 0', fontSize: '1.1rem', fontWeight: '700', color: '#ffffff' }}>{trimmed.replace('###', '').trim()}</h4>;
+    if (lastIdx < part.length) {
+      subParts.push(part.substring(lastIdx));
     }
-    if (trimmed.startsWith('##')) {
-      return <h3 key={i} style={{ margin: '24px 0 12px 0', fontSize: '1.25rem', fontWeight: '800', color: '#ffffff' }}>{trimmed.replace('##', '').trim()}</h3>;
-    }
-    if (trimmed.startsWith('#')) {
-      return <h2 key={i} style={{ margin: '28px 0 16px 0', fontSize: '1.5rem', fontWeight: '800', color: '#ffffff' }}>{trimmed.replace('#', '').trim()}</h2>;
-    }
-    if (trimmed.startsWith('-') || trimmed.startsWith('*')) {
-      const content = trimmed.substring(1).trim();
-      return <li key={i} style={{ marginLeft: '20px', marginBottom: '6px', color: 'var(--text-primary)' }}>{parseInlineBold(content)}</li>;
-    }
-    if (trimmed === '') {
-      return <div key={i} style={{ height: '12px' }} />;
-    }
-
-    return <p key={i} style={{ marginBottom: '14px', lineHeight: '1.6', color: 'var(--text-primary)', fontSize: '0.95rem' }}>{parseInlineBold(trimmed)}</p>;
+    return subParts;
   });
+
+  // 2. Bold: **bold**
+  parts = parts.flatMap(part => {
+    if (typeof part !== 'string') return part;
+    const regex = /\*\*([^*]+)\*\*/g;
+    const subParts = [];
+    let lastIdx = 0;
+    let match;
+    while ((match = regex.exec(part)) !== null) {
+      if (match.index > lastIdx) {
+        subParts.push(part.substring(lastIdx, match.index));
+      }
+      subParts.push(
+        <strong key={match.index} style={{ fontWeight: '700', color: '#ffffff' }}>
+          {match[1]}
+        </strong>
+      );
+      lastIdx = regex.lastIndex;
+    }
+    if (lastIdx < part.length) {
+      subParts.push(part.substring(lastIdx));
+    }
+    return subParts;
+  });
+
+  // 3. Italic: *italic*
+  parts = parts.flatMap(part => {
+    if (typeof part !== 'string') return part;
+    const regex = /\*([^*]+)\*/g;
+    const subParts = [];
+    let lastIdx = 0;
+    let match;
+    while ((match = regex.exec(part)) !== null) {
+      if (match.index > lastIdx) {
+        subParts.push(part.substring(lastIdx, match.index));
+      }
+      subParts.push(
+        <em key={match.index} style={{ fontStyle: 'italic', color: '#cbd5e1' }}>
+          {match[1]}
+        </em>
+      );
+      lastIdx = regex.lastIndex;
+    }
+    if (lastIdx < part.length) {
+      subParts.push(part.substring(lastIdx));
+    }
+    return subParts;
+  });
+
+  return parts;
 }
 
-function parseInlineBold(text) {
-  const parts = [];
-  let lastIdx = 0;
-  const boldRegex = /\*\*(.*?)\*\*/g;
-  let match;
-  while ((match = boldRegex.exec(text)) !== null) {
-    if (match.index > lastIdx) {
-      parts.push(text.substring(lastIdx, match.index));
+function renderMarkdown(text) {
+  if (!text) return null;
+
+  const lines = text.split('\n');
+  const blocks = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // 0. Handle Horizontal Rules
+    if (/^([-*_])\1\1+$/.test(trimmed) || trimmed === '---' || trimmed === '--') {
+      blocks.push(
+        <hr key={`hr-${i}`} style={{ border: 'none', borderTop: '1px solid var(--border-color)', margin: '20px 0', opacity: 0.5 }} />
+      );
+      i++;
+      continue;
     }
-    parts.push(<strong key={match.index} style={{ fontWeight: '700', color: '#ffffff' }}>{match[1]}</strong>);
-    lastIdx = boldRegex.lastIndex;
+
+    // 1. Handle Code Blocks
+    if (trimmed.startsWith('```')) {
+      const codeLines = [];
+      i++;
+      while (i < lines.length && !lines[i].trim().startsWith('```')) {
+        codeLines.push(lines[i]);
+        i++;
+      }
+      i++; // Skip closing ```
+      blocks.push(
+        <pre key={`code-${i}`} style={{
+          background: 'rgba(0, 0, 0, 0.4)',
+          border: '1px solid var(--border-color)',
+          padding: '16px',
+          borderRadius: '8px',
+          overflowX: 'auto',
+          fontFamily: 'monospace',
+          fontSize: '0.85rem',
+          color: '#e2e8f0',
+          margin: '16px 0'
+        }}>
+          <code>{codeLines.join('\n')}</code>
+        </pre>
+      );
+      continue;
+    }
+
+    // 2. Handle Tables
+    if (trimmed.startsWith('|')) {
+      const tableLines = [];
+      while (i < lines.length && lines[i].trim().startsWith('|')) {
+        tableLines.push(lines[i].trim());
+        i++;
+      }
+
+      if (tableLines.length >= 1) {
+        const parseRow = (rowText) => {
+          const cells = rowText.split('|').map(c => c.trim());
+          if (cells[0] === '') cells.shift();
+          if (cells[cells.length - 1] === '') cells.pop();
+          return cells;
+        };
+
+        const headerCells = parseRow(tableLines[0]);
+        let separatorRowIdx = -1;
+        if (tableLines[1] && tableLines[1].includes('-')) {
+          separatorRowIdx = 1;
+        }
+
+        const bodyRows = [];
+        const startIdx = separatorRowIdx !== -1 ? 2 : 1;
+        for (let r = startIdx; r < tableLines.length; r++) {
+          bodyRows.push(parseRow(tableLines[r]));
+        }
+
+        blocks.push(
+          <div key={`table-${i}`} style={{ overflowX: 'auto', margin: '20px 0', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', textAlign: 'left', background: 'rgba(15, 23, 42, 0.2)' }}>
+              <thead>
+                <tr style={{ borderBottom: '2px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.04)' }}>
+                  {headerCells.map((cell, cIdx) => (
+                    <th key={cIdx} style={{ padding: '12px 16px', fontWeight: '700', color: '#ffffff' }}>
+                      {parseInlineMarkdown(cell)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {bodyRows.map((rowCells, rIdx) => (
+                  <tr key={rIdx} style={{
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                    background: rIdx % 2 === 1 ? 'rgba(255, 255, 255, 0.01)' : 'transparent'
+                  }}>
+                    {rowCells.map((cell, cIdx) => (
+                      <td key={cIdx} style={{ padding: '10px 16px', color: 'var(--text-primary)' }}>
+                        {parseInlineMarkdown(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+      continue;
+    }
+
+    // 3. Handle Ordered Lists
+    const isOrderedListLine = (lineStr) => {
+      const t = lineStr.trim();
+      return /^\d+\.\s+/.test(t) || /^[-*]\s+\d+\.\s+/.test(t);
+    };
+
+    if (isOrderedListLine(line)) {
+      const listItems = [];
+      while (i < lines.length && isOrderedListLine(lines[i])) {
+        const itemTrimmed = lines[i].trim();
+        const cleanItem = itemTrimmed.replace(/^[-*]\s+/, '');
+        const match = cleanItem.match(/^\d+\.\s*(.*)/);
+        const content = match ? match[1] : cleanItem;
+        listItems.push(content);
+        i++;
+      }
+
+      blocks.push(
+        <ol key={`ol-${i}`} style={{ marginLeft: '24px', marginBottom: '14px', listStyleType: 'decimal' }}>
+          {listItems.map((item, idx) => (
+            <li key={idx} style={{ marginBottom: '6px', color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+              {parseInlineMarkdown(item)}
+            </li>
+          ))}
+        </ol>
+      );
+      continue;
+    }
+
+    // 4. Handle Bullet Lists
+    const isBulletListLine = (lineStr) => {
+      const t = lineStr.trim();
+      return (t.startsWith('- ') || t.startsWith('* ')) && !t.startsWith('**');
+    };
+
+    if (isBulletListLine(line)) {
+      const listItems = [];
+      while (i < lines.length && isBulletListLine(lines[i])) {
+        const itemTrimmed = lines[i].trim();
+        const content = itemTrimmed.substring(2).trim();
+        listItems.push(content);
+        i++;
+      }
+
+      blocks.push(
+        <ul key={`list-${i}`} style={{ marginLeft: '24px', marginBottom: '14px', listStyleType: 'disc' }}>
+          {listItems.map((item, idx) => (
+            <li key={idx} style={{ marginBottom: '6px', color: 'var(--text-primary)', fontSize: '0.95rem', lineHeight: '1.5' }}>
+              {parseInlineMarkdown(item)}
+            </li>
+          ))}
+        </ul>
+      );
+      continue;
+    }
+
+    // 5. Handle Headings
+    if (trimmed.startsWith('####')) {
+      blocks.push(
+        <h5 key={`h5-${i}`} style={{ margin: '16px 0 8px 0', fontSize: '1.0rem', fontWeight: '700', color: '#ffffff' }}>
+          {parseInlineMarkdown(trimmed.replace('####', '').trim())}
+        </h5>
+      );
+      i++;
+      continue;
+    }
+    if (trimmed.startsWith('###')) {
+      blocks.push(
+        <h4 key={`h4-${i}`} style={{ margin: '20px 0 10px 0', fontSize: '1.1rem', fontWeight: '700', color: '#ffffff' }}>
+          {parseInlineMarkdown(trimmed.replace('###', '').trim())}
+        </h4>
+      );
+      i++;
+      continue;
+    }
+    if (trimmed.startsWith('##')) {
+      blocks.push(
+        <h3 key={`h3-${i}`} style={{ margin: '24px 0 12px 0', fontSize: '1.25rem', fontWeight: '800', color: '#ffffff' }}>
+          {parseInlineMarkdown(trimmed.replace('##', '').trim())}
+        </h3>
+      );
+      i++;
+      continue;
+    }
+    if (trimmed.startsWith('#')) {
+      blocks.push(
+        <h2 key={`h2-${i}`} style={{ margin: '28px 0 16px 0', fontSize: '1.5rem', fontWeight: '800', color: '#ffffff' }}>
+          {parseInlineMarkdown(trimmed.replace('#', '').trim())}
+        </h2>
+      );
+      i++;
+      continue;
+    }
+
+    // 6. Handle Blank Lines
+    if (trimmed === '') {
+      blocks.push(<div key={`blank-${i}`} style={{ height: '8px' }} />);
+      i++;
+      continue;
+    }
+
+    // 7. Default Paragraph
+    blocks.push(
+      <p key={`p-${i}`} style={{ marginBottom: '14px', lineHeight: '1.6', color: 'var(--text-primary)', fontSize: '0.95rem' }}>
+        {parseInlineMarkdown(trimmed)}
+      </p>
+    );
+    i++;
   }
-  if (lastIdx < text.length) {
-    parts.push(text.substring(lastIdx));
-  }
-  return parts.length > 0 ? parts : text;
+
+  return blocks;
 }
 
 export default function AISummaryTab({ hookText, chartCode, resources = [], onExplainConcept }) {

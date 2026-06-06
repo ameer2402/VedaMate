@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Bot, User, Pencil, Check, X, Copy } from 'lucide-react';
 
-function parseInlineMarkdown(text, citationSnippets = {}) {
+function _parseInlineMarkdownCitations(text, citationSnippets = {}) {
   if (!text) return "";
   
   const parts = [];
@@ -114,6 +114,52 @@ function parseInlineMarkdown(text, citationSnippets = {}) {
   return parts.length > 0 ? parts : text;
 }
 
+function parseInlineMarkdown(text, citationSnippets = {}) {
+  if (!text) return "";
+  
+  let parts = [text];
+  
+  // 1. Inline code: `code`
+  parts = parts.flatMap(part => {
+    if (typeof part !== 'string') return part;
+    const regex = /`([^`]+)`/g;
+    const subParts = [];
+    let lastIdx = 0;
+    let match;
+    while ((match = regex.exec(part)) !== null) {
+      if (match.index > lastIdx) {
+        subParts.push(part.substring(lastIdx, match.index));
+      }
+      subParts.push(
+        <code key={`code-inline-${match.index}`} style={{
+          background: 'rgba(99, 102, 241, 0.1)',
+          color: '#a78bfa',
+          padding: '2px 6px',
+          borderRadius: '4px',
+          fontFamily: 'monospace',
+          fontSize: '0.85em',
+          border: '1px solid rgba(139, 92, 246, 0.2)'
+        }}>
+          {match[1]}
+        </code>
+      );
+      lastIdx = regex.lastIndex;
+    }
+    if (lastIdx < part.length) {
+      subParts.push(part.substring(lastIdx));
+    }
+    return subParts;
+  });
+
+  // 2. Pass to standard citation & bold parser
+  parts = parts.map(part => {
+    if (typeof part !== 'string') return part;
+    return _parseInlineMarkdownCitations(part, citationSnippets);
+  });
+
+  return parts;
+}
+
 
 export function renderMarkdown(text, citationSnippets = {}) {
   if (!text) return null;
@@ -190,20 +236,23 @@ export function renderMarkdown(text, citationSnippets = {}) {
         }
 
         blocks.push(
-          <div key={`table-${i}`} style={{ overflowX: 'auto' }}>
-            <table>
+          <div key={`table-${i}`} style={{ overflowX: 'auto', margin: '20px 0', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem', textAlign: 'left', background: 'rgba(15, 23, 42, 0.2)' }}>
               <thead>
-                <tr>
+                <tr style={{ borderBottom: '2px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.04)' }}>
                   {headerCells.map((cell, cIdx) => (
-                    <th key={cIdx}>{parseInlineMarkdown(cell, citationSnippets)}</th>
+                    <th key={cIdx} style={{ padding: '12px 16px', fontWeight: '700', color: '#ffffff' }}>{parseInlineMarkdown(cell, citationSnippets)}</th>
                   ))}
                 </tr>
               </thead>
               <tbody>
                 {bodyRows.map((rowCells, rIdx) => (
-                  <tr key={rIdx}>
+                  <tr key={rIdx} style={{
+                    borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+                    background: rIdx % 2 === 1 ? 'rgba(255, 255, 255, 0.01)' : 'transparent'
+                  }}>
                     {rowCells.map((cell, cIdx) => (
-                      <td key={cIdx}>{parseInlineMarkdown(cell, citationSnippets)}</td>
+                      <td key={cIdx} style={{ padding: '10px 16px', color: 'var(--text-primary)' }}>{parseInlineMarkdown(cell, citationSnippets)}</td>
                     ))}
                   </tr>
                 ))}
