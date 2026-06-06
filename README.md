@@ -1,175 +1,261 @@
-🎓 Transform Any PDF into an Intelligent Conversational Learning Partner 🤖
-Powered by LangGraph • Google Gemini • ChromaDB • Hybrid RAG Architecture
+<div align="center">
 
-📋 Table of Contents
-🌟 Overview
-🎯 The Problem We're Solving
-✨ Our Solution
-🚀 Key Features
-🏗️ Architecture
-🛠️ Tech Stack
-🤖 Meet the Agents
-🆚 Why VedaMate Stands Out
-📦 Setup & Installation
-🎮 How to Use
-📊 Performance Metrics
-🌍 Real-World Impact
-🗺️ Roadmap
-🤝 Contributing
-📜 License
-👨💻 Author
-🏆 Acknowledgments
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:090D16,50:6366F1,100:090D16&height=240&section=header&text=VEDAMATE&fontSize=70&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Stateful%20Multi-Agent%20AI%20Tutor%20%26%20Courseware%20Platform&descSize=20&descAlignY=62&descAlign=50"/>
 
-🌟 Overview
-VedaMate is a sophisticated, production-grade Conversational AI Teaching Assistant built with Python, Streamlit, and Google's Generative AI ecosystem. Leveraging a state-of-the-art Retrieval-Augmented Generation (RAG) architecture orchestrated by a multi-agent system on LangGraph, this application transforms static PDF documents into interactive, intelligent learning partners.
+<h3>🎓 Transform Static Textbooks into Intelligent Conversational Learning Partners 🤖</h3>
 
-💡 Upload any PDF → Ask anything → Get context-aware answers grounded in your document AND real-time web data.
+<p><em>Powered by React • FastAPI • LangGraph • Google Gemini • ChromaDB • SQL</em></p>
 
-Whether you're a student decoding a 500-page textbook, a researcher parsing dense academic papers, or a professional analyzing legal/technical documents — VedaMate delivers semantic, citation-backed answers in seconds.
+<p>
+  <img src="https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black&labelColor=000000"/>
+  <img src="https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white&labelColor=000000"/>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white&labelColor=000000"/>
+  <img src="https://img.shields.io/badge/LangGraph-0A0E1A?style=for-the-badge&logo=langchain&logoColor=white&labelColor=000000"/>
+  <img src="https://img.shields.io/badge/ChromaDB-FC6D26?style=for-the-badge&logo=git&logoColor=white&labelColor=000000"/>
+</p>
 
-🎯 The Problem We're Solving
-Learning from digital documents today is broken:
+<p>
+  <img src="https://img.shields.io/badge/Architecture-Stateful_Multi--Agent-6366F1?style=for-the-badge&labelColor=000000"/>
+  <img src="https://img.shields.io/badge/Retrieval-Parallel_Hybrid_RAG-00C853?style=for-the-badge&labelColor=000000"/>
+  <img src="https://img.shields.io/badge/Deployment-Vercel_%26_Render-4285F4?style=for-the-badge&labelColor=000000"/>
+</p>
 
-🚨 Pain Point | 📉 Impact
-Information Overload | Hard to find specific answers in 100s of pages; Ctrl+F misses context
-Zero Interactivity | PDFs are read-only — you can't ask, clarify, or explore
-Disconnected Learning | Constant tab-switching between textbook & browser kills focus
-Generic AI Limitations | ChatGPT has no clue about your specific course material → hallucinations
+</div>
 
-✨ Our Solution
-An intelligent agentic application that fuses your personal documents with the live web, delivering grounded, hallucination-free, citation-rich answers through an elegant conversational interface.
+---
 
-🚀 Key Features
-📄 PDF Document Chat
-Upload any PDF and engage in semantic, context-aware conversations. Powered by vector embeddings, not keyword matching.
+## 🌟 Overview
 
-🤖 Multi-Agent Workflow
-6+ specialized AI agents orchestrated via LangGraph state machine — each handling a discrete task with surgical precision.
+**VedaMate** is an enterprise-grade, full-stack Intelligent Study Workspace designed to transform static PDF textbooks and course documents into interactive, context-aware learning companions. It replaces passive reading with active, personalized study paths by integrating a state-of-the-art **stateful multi-agent LangGraph system** with a sleek **React frontend** and a high-performance **FastAPI backend**.
 
-🌐 Hybrid Parallel Search
-Async parallel retrieval from ChromaDB vector store AND Google Custom Search API — slashing latency by ~40%.
+### 💼 Technical Highlights:
+- **Stateful Multi-Agent Orchestration**: Orchestrated via **LangGraph**, the backend hosts a multi-agent system of 6+ specialized agents that coordinate stateful transitions to handle query rewriting, intent classification, and search.
+- **Parallel Hybrid RAG**: Implements concurrent asynchronous data extraction from a **ChromaDB vector store** and live web sources using **Google Custom Search API**, slashing retrieval latency by **~40%**.
+- **Syllabus & Courseware Alignment**: Automatically parses uploaded PDFs to extract structural syllabus chapters and dynamically compiles custom interactive study assets (Summaries, Scenarios, and Flashcards) tailored to the student's persona.
+- **Robust SQL Persistence**: Persists user profiles, study progress, chapter mastery scores, and chat history using a database layer, ensuring progress is tracked continuously.
+- **Premium UX/UI**: Featuring a responsive dark-themed workspace with real-time token streaming, Mermaid.js flowcharts, interactive Quiz Sandboxes, and spaced-repetition active recall decks.
 
-🧠 Intent-Aware Routing
-Smart Router Agent classifies queries (factual, reasoning, greeting) and dynamically chooses the optimal execution path.
+---
 
-📚 Citation-Grounded Answers
-Every response is backed by source citations from the PDF, eliminating hallucinations and boosting trust.
+## ✨ Key Features
 
-💬 Streaming Conversational UI
-Clean, responsive Streamlit interface with real-time token streaming, follow-up suggestions & keyboard navigation.
+<table>
+  <tr>
+    <td width="50%">
+      <h3>📘 Automatic Syllabus Alignment</h3>
+      <p>Upload any textbook PDF and let the AI parse the structural chapters. Alternatively, paste your course syllabus to align vector search chunks directly to your lecture topics.</p>
+    </td>
+    <td width="50%">
+      <h3>📖 AI Summaries & Custom Analogies</h3>
+      <p>Generates comprehensive academic textbook summaries. Automatically adapts vocabulary, depth, and real-world analogies to match the student's selected Education Level and Interests.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>🧪 Scenario Sandbox</h3>
+      <p>Engage in real-world decision-making quizzes. Read complex scenarios, make choices, and receive detailed immediate feedback outlining correct principles and common misconceptions.</p>
+    </td>
+    <td width="50%">
+      <h3>🧠 Active Recall Decks</h3>
+      <p>Commit textbook facts to memory using flashcards. Features self-assessed difficulty scoring to support spaced-repetition learning.</p>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <h3>📊 Visual Concept Maps</h3>
+      <p>Generates interactive Mermaid.js flowcharts mapped directly to the chapter's conceptual architecture. Students can click any node to request instant ELI5 or Deep-Dive explanations.</p>
+    </td>
+    <td width="50%">
+      <h3>💬 Citation-Backed Chat</h3>
+      <p>Engage in semantic dialogues with your documents. Every response includes inline page citations `[p. X]` and hovered textbook snippets, eliminating AI hallucinations.</p>
+    </td>
+  </tr>
+</table>
 
-🏗️ Architecture
-🔥 Modern RAG Pipeline Orchestrated by LangGraph
-The end-to-end workflow is a stateful multi-agent graph where each agent performs a specialized task — from query rewriting to hybrid retrieval to final response synthesis.
+---
 
-🔄 Workflow Step-by-Step
-Document Ingestion → User uploads a PDF → app chunks the doc → generates embeddings via text-embedding-004 → stores them in ChromaDB.
-Query Entry → User asks a question via Streamlit chat input.
-Query Rewriting → Conversational follow-ups like "why is that?" are converted into standalone queries using chat history.
-Multi-Query Expansion → Single query is expanded into 5–6 diverse queries to maximize retrieval coverage.
-Intent Classification → Router Agent decides: factual lookup, reasoning, summary, or greeting — and routes accordingly.
-Hybrid Parallel Search → For factual queries, both ChromaDB and Google CSE are queried simultaneously via asyncio → ~40% latency drop.
-Response Synthesis → All retrieved chunks are de-duplicated and passed to Gemini 2.0 Flash → outputs a citation-grounded answer.
-Streaming Output → Response is token-streamed back to the Streamlit UI in real-time.
+## 👥 System Workflow & Architecture
 
-🛠️ Tech Stack
-Layer | Technology
-🎨 Frontend | Streamlit — Real-time streaming UI
-🧠 Orchestration | LangGraph — Stateful multi-agent workflow
-🔗 Framework | LangChain — Agent tooling & chains
-🤖 LLM | Google Gemini 2.0 Flash — Response generation
-🔢 Embeddings | text-embedding-004 (Google Generative AI)
-💾 Vector Store | ChromaDB — Persistent semantic search
-🌍 Web Search | Google Programmable Search Engine (CSE) API
-⚡ Concurrency | Python asyncio — Parallel retrieval
-📄 PDF Parsing | PyPDF / LangChain Document Loaders
-🔐 Config | python-dotenv — Secure credential management
+VedaMate processes document ingestion, vector indexing, syllabus alignment, and conversational RAG using a highly structured, parallel pipeline.
 
-🤖 Meet the Agents
-Our LangGraph state machine orchestrates specialized agents — each performing a discrete, optimized task:
+```mermaid
+graph TD
+    User[Student / User] -->|1. Ingests PDF| WebApp[React Frontend]
+    WebApp -->|2. Processes & Vectorizes| FastApi[FastAPI Backend]
+    FastApi -->|3. Extracts Syllabus| Analyzer[Syllabus Analyzer]
+    FastApi -->|4. Generates Embeddings| GeminiEmbed[Gemini Embeddings]
+    GeminiEmbed -->|5. Indexes Chunks| Chroma[ChromaDB Vector Store]
+    
+    User -->|6. Selects Chapter & Studies| StudyHub[Active Study Hub]
+    StudyHub -->|AI Summary & Analogy| ConceptMastery[Concept Mastery Engine]
+    StudyHub -->|Scenario Sandbox Quiz| QuizAgent[Quiz/Scenario Agent]
+    StudyHub -->|Active Recall Spaced Repetition| FlashcardAgent[Flashcard Agent]
+    
+    User -->|7. Chats with Document| MultiAgent[Multi-Agent QA Workflow]
+    MultiAgent -->|Router Agent| IntentClassifier[Intent Classifier]
+    IntentClassifier -->|Factual Lookup| ParallelSearch[Parallel Search: ChromaDB + Google Search]
+    IntentClassifier -->|Reasoning Task| DocContext[Document Context Retrieval]
+    ParallelSearch -->|Synthesizes Response| Gemini[Gemini 1.5/2.0 Flash]
+    DocContext -->|Synthesizes Response| Gemini
+    Gemini -->|8. Returns Citation-Backed Answer| User
+```
 
-Agent | 🎯 Responsibility
-🔄 Query Rewriter Agent | Transforms conversational follow-ups into standalone queries.
-🔀 Multi-Query Agent | Expands a single user question into 5–6 diverse parallel queries.
-🧭 Router Agent | Classifies user intent (factual, reasoning, greeting, summary).
-📚 Vector DB Agent | Performs semantic similarity search over the user's PDF embeddings.
-🌐 Web Search Agent | Queries the live web via Google CSE for up-to-date context.
-🎯 Response Synthesizer | Aggregates, de-duplicates, and synthesizes context using Gemini.
+---
 
-📦 Setup & Installation
-✅ Prerequisites
-🐍 Python 3.10 or higher
-🔧 Git for cloning
-🔑 Google Cloud Account (personal Gmail recommended)
+## 🏗️ Technical Architecture
 
-1️⃣ Clone the Repository
-git clone https://github.com/ameer2402/VedaMate.git
-cd VedaMate
+```text
+                ┌─────────────────────────────┐
+                │     👤 USER / STUDENT       │
+                └──────────────┬──────────────┘
+                               │ HTTP/HTTPS
+                               ▼
+        ╔══════════════════════════════════════════════╗
+        ║            ⚛️ REACT FRONTEND SPA             ║
+        ║  (Mermaid.js Flowcharts, State Management)   ║
+        ╚══════════════════════════════════════════════╝
+                               │
+                               │ REST API (JSON) [Vercel Rewrites Proxy]
+                               ▼
+        ╔══════════════════════════════════════════════╗
+        ║         ⚙️ FASTAPI BACKEND SERVICE           ║
+        ║  (SQLAlchemy, Multi-threading, asyncio RAG)  ║
+        ╚══════════════════════════════════════════════╝
+                               │
+            ┌──────────────────┼──────────────────┐
+            ▼                  ▼                  ▼
+   ┌─────────────────┐ ┌───────────────┐ ┌──────────────────┐
+   │ 🗄️ PERSISTENT DB │ │ 🔢 CHROMADB   │ │ 🧠 GOOGLE GEMINI │
+   │ (SQLite/Postgres│ │ (Vector Index │ │ (LLM Generation  │
+   │  Metadata/Chat) │ │  PDF Chunks)  │ │  & Embeddings)   │
+   └─────────────────┘ └───────────────┘ └──────────────────┘
+```
 
-2️⃣ Create & Activate a Virtual Environment
-python3 -m venv venv
-source venv/bin/activate
+---
 
-3️⃣ Install Dependencies
-pip install -r requirements.txt
+## 🤖 Meet the Agents (LangGraph Stateful Flow)
 
-4️⃣ Configure Environment Variables (.env)
-Create .env in the project root:
-# ====== Google AI Services (Gemini + Embeddings) ======
-GOOGLE_API_KEY="YOUR_GOOGLE_API_KEY_HERE"
+VedaMate's multi-agent graph coordinates specialized workers to execute queries with maximum relevance and speed:
 
-# ====== Google Programmable Search Engine ID ======
-GOOGLE_CSE_ID="YOUR_GOOGLE_CSE_ID_HERE"
+| Agent | 🎯 Responsibility | 🛠️ Implementation |
+|:---|:---|:---|
+| 🔀 **Router Agent** | Classifies incoming query intent (e.g. greeting, general, factual, reasoning, quiz, syllabus) | Gemini-powered semantic routing |
+| 🔄 **Query Rewriter** | Analyzes chat history and reforms follow-up queries into standalone, search-optimized questions | Standalone rephrasing chain |
+| 📚 **Vector DB Agent** | Queries ChromaDB for local context, retrieving the most relevant pages and text chunks | Semantic search with Query Expansion |
+| 🌐 **Web Search Agent** | Fetches real-time academic or technical data from the web to complement local textbook facts | Google CSE integration |
+| 🧠 **Reasoning Agent** | Resolves subjective, planning, or deep analysis questions requiring cross-referencing | Context-aware synthesis chain |
+| 🧪 **Quiz/Study Generator**| Dynamically generates persona-aligned multiple-choice scenarios and spaced-repetition flashcards | JSON-structured generation |
 
-5️⃣ Run the Application 🚀
-streamlit run app.py
-🌐 Your browser will automatically open at http://localhost:8501
+---
 
-🎮 How to Use
-1️⃣ 📤 Upload a PDF
-2️⃣ 📂 Select a Document
-3️⃣ 💬 Start Chatting
-4️⃣ ✨ Use Smart Suggestions
+## 🛠️ Tech Stack & Tools
 
-📊 Performance Metrics
-Metric | Improvement
-🎯 Answer Relevance | ⬆️ +50% vs. baseline RAG
-🚫 Hallucination Reduction | ⬇️ −30%
-⚡ Latency Reduction | ⬇️ −40% via async parallel retrieval
-💰 Token Optimization | ⬇️ −25% via intent classification
-📚 Document Capacity | 📄 200+ pages per upload
-🤖 Active Agents | 🧠 6+ specialized agents
+| Layer | Technology | Purpose |
+|:---|:---|:---|
+| ⚛️ **Frontend** | `React`, `Vite`, `JavaScript` | Modern, responsive component-based client |
+| 📊 **Visualizations** | `Mermaid.js` | Renders dynamic flowcharts from text-based diagrams |
+| ⚙️ **Backend** | `Python`, `FastAPI` | Asynchronous, concurrent REST API backend |
+| 🔗 **Orchestration** | `LangGraph`, `LangChain` | Stateful, cyclical agent workflows and chain abstractions |
+| 🧠 **Generative AI** | `Google Gemini 1.5/2.0 Flash` | High-speed, high-quality response synthesis |
+| 🔢 **Embeddings** | `models/gemini-embedding-001` | Semantic text vectorization |
+| 💾 **Vector Database** | `ChromaDB` | Persistent local storage for indexed PDF document embeddings |
+| 🗄️ **Relational DB** | `SQLite` (Local) / `PostgreSQL` | Stores profile personas, textbook syllabi, and chat histories |
+| 🐋 **DevOps** | `Docker` | Containerized build, testing, and deployment |
 
-🌍 Real-World Impact
-🎓 Students | Save dozens of hours; instant clarification
-🔬 Researchers | Rapidly digest dense academic papers
-⚖️ Legal Professionals | Query lengthy contracts semantically
-📊 Analysts | Parse technical reports in minutes
-👨🏫 Educators | Build interactive course companions
+---
 
-🗺️ Roadmap
- 🧪 Multi-PDF Cross-Document Search
- 🎙️ Voice Input / Speech-to-Text integration
- 🌐 Multilingual Support
- 📊 Auto-Generated Quizzes & Flashcards per topic module
- 🔁 Conversation Memory Persistence
- 🐳 Docker Containerization
- 🔐 Multi-User Authentication
- 📈 Analytics Dashboard
+## 📦 Setup & Installation
 
-🤝 Contributing
-Contributions are welcome and appreciated! 🎉
+### 🔑 Prerequisites
+- **Python 3.10+**
+- **Node.js 18+** & **npm**
+- **Google Gemini API Key** (from Google AI Studio)
+- **Google Custom Search Engine ID** and API Key (Optional, for web search functionality)
 
-📜 License
-Distributed under the MIT License. See LICENSE for more details.
+---
 
-👨💻 Author
-Mohammed Ameer Khan
-Full Stack Software Engineer • Ex-Google Apprentice • AI Builder
+### 1️⃣ Configure the Backend
 
-🏆 Acknowledgments
-🎯 Google AI India Hackathon 2025
-🤖 Google Generative AI Team
-🦜 LangChain & LangGraph
-🧠 ChromaDB
-🎨 Streamlit
+1. **Navigate to the root directory and create a virtual environment:**
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+
+2. **Install the backend dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Configure Environment Variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   # Google AI Services API Key
+   GOOGLE_API_KEY="your-gemini-api-key-here"
+
+   # Google Custom Search API (Optional for Web Search)
+   GOOGLE_CSE_ID="your-google-custom-search-engine-id"
+   
+   # Database Configuration (Optional, defaults to SQLite)
+   DATABASE_URL="postgresql://user:pass@host:port/dbname"
+   ```
+
+4. **Launch the FastAPI Server:**
+   ```bash
+   uvicorn app_api:app --reload --port 8000
+   ```
+   *The API documentation will be available at `http://127.0.0.1:8000/docs`.*
+
+---
+
+### 2️⃣ Configure the Frontend
+
+1. **Navigate to the frontend folder:**
+   ```bash
+   cd frontend
+   ```
+
+2. **Install the node modules:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the React Dev Server:**
+   ```bash
+   npm run dev
+   ```
+   *Open `http://localhost:5173` in your browser to start using VedaMate.*
+
+---
+
+## 👨💻 Author
+
+<div align="center">
+
+### **Mohammed Ameer Khan**
+*Full Stack Software Engineer • Ex-Google Apprentice • AI Builder*
+
+<p>
+  <a href="https://www.linkedin.com/in/mohammed-ameerkhan-22368626a/">
+    <img src="https://img.shields.io/badge/LinkedIn-CONNECT-0077B5?style=for-the-badge&logo=linkedin&logoColor=white&labelColor=000000"/>
+  </a>
+  <a href="mailto:ameerkhan20241a0497@gmail.com">
+    <img src="https://img.shields.io/badge/Email-REACH%20OUT-D14836?style=for-the-badge&logo=gmail&logoColor=white&labelColor=000000"/>
+  </a>
+  <a href="https://github.com/ameer2402">
+    <img src="https://img.shields.io/badge/GitHub-FOLLOW-181717?style=for-the-badge&logo=github&logoColor=white&labelColor=000000"/>
+  </a>
+  <a href="https://portfolio-frontend-rho-blond.vercel.app/">
+    <img src="https://img.shields.io/badge/Portfolio-EXPLORE-FF5722?style=for-the-badge&logo=googlechrome&logoColor=white&labelColor=000000"/>
+  </a>
+</p>
+
+</div>
+
+<div align="center">
+
+### ⭐ If this project demonstrates the engineering quality you're looking for, feel free to **reach out!** 🚀
+
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:6366F1,50:090D16,100:6366F1&height=140&section=footer&text=Built%20with%20%E2%9A%A1%20by%20Ameer%20Khan&fontSize=22&fontColor=ffffff&animation=twinkling&fontAlignY=70"/>
+
+</div>
