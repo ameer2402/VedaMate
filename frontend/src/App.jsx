@@ -39,18 +39,18 @@ export default function App() {
   const [chapters, setChapters] = useState([]);
   const [masteryMap, setMasteryMap] = useState({});
   const [selectedTopic, setSelectedTopic] = useState(null);
-  
+
   // Topic Asset States
   const [assets, setAssets] = useState(null);
   const [assetsLoading, setAssetsLoading] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
   const [chatThinking, setChatThinking] = useState(false);
-  
+
   // Global chat states
   const [globalChatMessages, setGlobalChatMessages] = useState([]);
   const [globalChatThinking, setGlobalChatThinking] = useState(false);
   const [showGlobalChat, setShowGlobalChat] = useState(false);
-  
+
   // Active Main Panel View Tab
   const [activeTab, setActiveTab] = useState('dashboard'); // 'dashboard' | 'summary' | 'chat' | 'scenario' | 'flashcards'
 
@@ -111,10 +111,10 @@ export default function App() {
       if (e.target.closest('#selection-tooltip') || e.target.closest('#explanation-popup')) {
         return;
       }
-      
+
       const selection = window.getSelection();
       const text = selection.toString().trim();
-      
+
       if (text.length >= 3 && text.length <= 3000) {
         try {
           const range = selection.getRangeAt(0);
@@ -231,7 +231,7 @@ export default function App() {
       const res = await fetch(`/api/textbooks/${encodeURIComponent(pdfName)}/chapters`);
       const data = await res.json();
       setChapters(data.chapters || []);
-      
+
       const parsedMastery = {};
       if (data.mastery) {
         Object.keys(data.mastery).forEach(topic => {
@@ -347,7 +347,7 @@ export default function App() {
 
   const handleSendMessage = async (text) => {
     if (chatThinking) return;
-    
+
     // Add optimistic user message
     const updatedMessages = [...chatMessages, { role: 'user', content: text }];
     setChatMessages(updatedMessages);
@@ -370,10 +370,10 @@ export default function App() {
 
   const handleEditMessage = async (index, newText) => {
     if (chatThinking) return;
-    
+
     // Truncate local chat messages state up to index - 1
     const truncatedHistory = chatMessages.slice(0, index);
-    
+
     // Add optimistic edited user message
     const updatedMessages = [...truncatedHistory, { role: 'user', content: newText }];
     setChatMessages(updatedMessages);
@@ -465,7 +465,7 @@ export default function App() {
       setUploadError("Please select a PDF file first.");
       return;
     }
-    
+
     setUploadError('');
     setProcessingPdf(file.name);
     setShowUploadForm(false);
@@ -525,7 +525,7 @@ export default function App() {
     : '320px 1fr';
 
   return (
-    <div 
+    <div
       className="app-container"
       style={{
         display: 'grid',
@@ -535,9 +535,9 @@ export default function App() {
     >
       {/* Sidebar Backdrop Overlay */}
       {sidebarOpen && (
-        <div 
-          className="sidebar-backdrop" 
-          onClick={() => setSidebarOpen(false)} 
+        <div
+          className="sidebar-backdrop"
+          onClick={() => setSidebarOpen(false)}
         />
       )}
 
@@ -574,9 +574,9 @@ export default function App() {
       />
 
       {/* 2. Workspace (Middle Column) */}
-      <main 
-        className="main-content" 
-        style={{ 
+      <main
+        className="main-content"
+        style={{
           overflow: 'hidden',
           visibility: showGlobalChat ? 'hidden' : 'visible',
           opacity: showGlobalChat ? 0 : 1,
@@ -584,17 +584,17 @@ export default function App() {
         }}
       >
         {/* Header toolbar */}
-        <header 
+        <header
           className="workspace-header"
-          style={{ 
-            height: '68px', 
-            borderBottom: '1px solid var(--border-color)', 
-            display: 'flex', 
-            justifyContent: 'space-between', 
-            alignItems: 'center', 
-            background: 'rgba(10, 10, 10, 0.8)', 
-            backdropFilter: 'blur(8px)', 
-            boxSizing: 'border-box' 
+          style={{
+            height: '68px',
+            borderBottom: '1px solid var(--border-color)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'rgba(10, 10, 10, 0.8)',
+            backdropFilter: 'blur(8px)',
+            boxSizing: 'border-box'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -617,10 +617,10 @@ export default function App() {
             </button>
           </div>
 
-          
+
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             {profile && (
-              <div 
+              <div
                 style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', border: '1px solid var(--border-color)', borderRadius: '6px', padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}
                 onClick={() => setEditingProfile(true)}
               >
@@ -642,13 +642,13 @@ export default function App() {
                   <ArrowLeft size={14} /> Back
                 </button>
               </div>
-              <GlobalProfile 
-                initialProfile={profile} 
+              <GlobalProfile
+                initialProfile={profile}
                 onSave={(p) => {
                   handleSaveProfile(p);
                   setEditingProfile(false);
-                }} 
-                onCancel={() => setEditingProfile(false)} 
+                }}
+                onCancel={() => setEditingProfile(false)}
               />
             </div>
           ) : processingPdf ? (
@@ -669,7 +669,7 @@ export default function App() {
               <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', marginBottom: '24px' }}>
                 Ingest a textbook PDF file and optionally paste course topics. VedaMate aligns and vectorizes components.
               </p>
-              
+
               {uploadError && (
                 <div style={{ display: 'flex', gap: '8px', padding: '16px', borderRadius: '8px', border: '1px solid #441111', background: '#220000', color: '#ff8888', marginBottom: '20px', fontSize: '0.85rem', alignItems: 'center' }}>
                   <AlertCircle size={16} />
@@ -774,7 +774,7 @@ export default function App() {
                         Select one of the study modules below to explore this topic:
                       </p>
                     </div>
-                    
+
                     <div className="feature-grid">
                       <div className="feature-card" onClick={() => setActiveTab('summary')}>
                         <div className="feature-card-icon">
@@ -813,15 +813,15 @@ export default function App() {
                     {/* Activity header with back button */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '24px' }}>
                       <div>
-                        <button 
-                          className="btn-secondary" 
-                          onClick={() => setActiveTab('dashboard')} 
+                        <button
+                          className="btn-secondary"
+                          onClick={() => setActiveTab('dashboard')}
                           style={{ padding: '8px 16px', display: 'inline-flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', borderRadius: '8px' }}
                         >
                           <ArrowLeft size={14} /> Back to Topic Dashboard
                         </button>
                       </div>
-                      
+
                       <div>
                         <span style={{ fontSize: '0.75rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
                           {selectedTopic}
@@ -887,326 +887,326 @@ export default function App() {
               </div>
             )
           ) : (
-          /* Fallback when no book selected (Library Hub) */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px', margin: '0 auto', width: '100%', padding: '20px 0' }}>
-            {/* Hero Section */}
-            <div style={{ textAlign: 'center', marginBottom: '12px' }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)', border: '1px solid var(--border-color)', borderRadius: '24px', padding: '8px 16px', marginBottom: '20px', gap: '8px' }}>
-                <Sparkles size={14} style={{ color: 'var(--accent-purple)' }} />
-                <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--accent-purple)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                  Intelligent Study Workspace
-                </span>
-              </div>
-              <h1 style={{ fontSize: '2.5rem', fontWeight: '800', letterSpacing: '-0.04em', marginBottom: '16px', background: 'linear-gradient(to right, #ffffff, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-                Welcome to VedaMate
-              </h1>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto' }}>
-                Ingest textbook PDFs to generate customized AI summaries, interactive scenarios, spaced-repetition flashcards, and a context-aware chat assistant.
-              </p>
-            </div>
-
-            {/* Quick Action Hero Card */}
-            <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(9, 13, 22, 0.7) 100%)', border: '1px solid var(--border-color)' }}>
-              <BookOpen size={48} style={{ margin: '0 auto 20px auto', color: 'var(--accent-purple)', filter: 'drop-shadow(0 0 10px rgba(167, 139, 250, 0.3))' }} />
-              <h3 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#ffffff', marginBottom: '12px' }}>Start Your Learning Session</h3>
-              <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', maxWidth: '460px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
-                Select an existing textbook from the left sidebar library to resume studying, or ingest a new PDF book to align and index its syllabus.
-              </p>
-              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-                <button className="btn-primary" onClick={() => setShowUploadForm(true)} style={{ padding: '14px 28px' }}>
-                  <Upload size={16} /> Ingest New PDF Book
-                </button>
-              </div>
-            </div>
-
-            {/* How it works features */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginTop: '12px' }}>
-              <div style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.01)' }}>
-                <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '12px' }}>📘</span>
-                <h4 style={{ fontWeight: '700', color: '#ffffff', marginBottom: '8px', fontSize: '0.95rem' }}>1. Custom Syllabus Alignment</h4>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  Upload a syllabus or let the AI parse chapters to create structured learning pathways.
+            /* Fallback when no book selected (Library Hub) */
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px', margin: '0 auto', width: '100%', padding: '20px 0' }}>
+              {/* Hero Section */}
+              <div style={{ textAlign: 'center', marginBottom: '12px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)', border: '1px solid var(--border-color)', borderRadius: '24px', padding: '8px 16px', marginBottom: '20px', gap: '8px' }}>
+                  <Sparkles size={14} style={{ color: 'var(--accent-purple)' }} />
+                  <span style={{ fontSize: '0.78rem', fontWeight: '700', color: 'var(--accent-purple)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                    Intelligent Study Workspace
+                  </span>
+                </div>
+                <h1 style={{ fontSize: '2.5rem', fontWeight: '800', letterSpacing: '-0.04em', marginBottom: '16px', background: 'linear-gradient(to right, #ffffff, #cbd5e1)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+                  Welcome to VedaMate
+                </h1>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: '1.6', maxWidth: '600px', margin: '0 auto' }}>
+                  Ingest textbook PDFs to generate customized AI summaries, interactive scenarios, spaced-repetition flashcards, and a context-aware chat assistant.
                 </p>
               </div>
-              <div style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.01)' }}>
-                <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '12px' }}>🧪</span>
-                <h4 style={{ fontWeight: '700', color: '#ffffff', marginBottom: '8px', fontSize: '0.95rem' }}>2. Scenario Sandbox</h4>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  Apply concepts to real-world scenarios to bridge the gap between theory and practice.
+
+              {/* Quick Action Hero Card */}
+              <div className="glass-panel" style={{ padding: '40px', textAlign: 'center', background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.4) 0%, rgba(9, 13, 22, 0.7) 100%)', border: '1px solid var(--border-color)' }}>
+                <BookOpen size={48} style={{ margin: '0 auto 20px auto', color: 'var(--accent-purple)', filter: 'drop-shadow(0 0 10px rgba(167, 139, 250, 0.3))' }} />
+                <h3 style={{ fontSize: '1.3rem', fontWeight: '800', color: '#ffffff', marginBottom: '12px' }}>Start Your Learning Session</h3>
+                <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', maxWidth: '460px', margin: '0 auto 24px auto', lineHeight: '1.6' }}>
+                  Select an existing textbook from the left sidebar library to resume studying, or ingest a new PDF book to align and index its syllabus.
                 </p>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                  <button className="btn-primary" onClick={() => setShowUploadForm(true)} style={{ padding: '14px 28px' }}>
+                    <Upload size={16} /> Ingest New PDF Book
+                  </button>
+                </div>
               </div>
-              <div style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.01)' }}>
-                <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '12px' }}>🧠</span>
-                <h4 style={{ fontWeight: '700', color: '#ffffff', marginBottom: '8px', fontSize: '0.95rem' }}>3. Active Recall Decks</h4>
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
-                  Leverage spaced repetition flashcards with self-assessed recall difficulty scoring.
-                </p>
+
+              {/* How it works features */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px', marginTop: '12px' }}>
+                <div style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.01)' }}>
+                  <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '12px' }}>📘</span>
+                  <h4 style={{ fontWeight: '700', color: '#ffffff', marginBottom: '8px', fontSize: '0.95rem' }}>1. Custom Syllabus Alignment</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                    Upload a syllabus or let the AI parse chapters to create structured learning pathways.
+                  </p>
+                </div>
+                <div style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.01)' }}>
+                  <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '12px' }}>🧪</span>
+                  <h4 style={{ fontWeight: '700', color: '#ffffff', marginBottom: '8px', fontSize: '0.95rem' }}>2. Scenario Sandbox</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                    Apply concepts to real-world scenarios to bridge the gap between theory and practice.
+                  </p>
+                </div>
+                <div style={{ padding: '20px', borderRadius: '12px', border: '1px solid var(--border-color)', background: 'rgba(255, 255, 255, 0.01)' }}>
+                  <span style={{ fontSize: '1.5rem', display: 'block', marginBottom: '12px' }}>🧠</span>
+                  <h4 style={{ fontWeight: '700', color: '#ffffff', marginBottom: '8px', fontSize: '0.95rem' }}>3. Active Recall Decks</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                    Leverage spaced repetition flashcards with self-assessed recall difficulty scoring.
+                  </p>
+                </div>
               </div>
-            </div>
-          </div>
-        )}
-
-      </div>
-    </main>
-
-    {/* 3. Global Textbook Assistant (Right Column) */}
-    {selectedPdf && (
-      <div 
-        className="global-agent-panel"
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          background: 'rgba(9, 13, 22, 0.4)',
-          borderLeft: showGlobalChat ? '1px solid var(--border-color)' : 'none',
-          height: '100vh',
-          overflow: 'hidden',
-          visibility: showGlobalChat ? 'visible' : 'hidden',
-          opacity: showGlobalChat ? 1 : 0,
-          transition: 'opacity 0.3s ease, visibility 0.3s ease'
-        }}
-      >
-        {/* Panel Header */}
-        <header style={{
-          height: '68px',
-          padding: '0 24px 0 32px',
-          borderBottom: '1px solid var(--border-color)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          background: 'rgba(10, 10, 10, 0.8)',
-          backdropFilter: 'blur(8px)',
-          boxSizing: 'border-box'
-        }}>
-          <div>
-            <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
-              <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#a78bfa', boxShadow: '0 0 10px #a78bfa' }}></span>
-              Global Textbook Assistant
-            </h3>
-            <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', margin: 0 }}>
-              Ask questions across the entire textbook scope
-            </p>
-          </div>
-          
-          <button
-            onClick={() => setShowGlobalChat(false)}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: '32px',
-              height: '32px',
-              borderRadius: '50%',
-              transition: 'all 0.2s ease'
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
-              e.currentTarget.style.color = '#ffffff';
-              e.currentTarget.style.transform = 'rotate(90deg)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = 'var(--text-secondary)';
-              e.currentTarget.style.transform = 'rotate(0deg)';
-            }}
-          >
-            <X size={18} />
-          </button>
-        </header>
-
-        {/* Panel Body */}
-        <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-          <ChatTab
-            messages={globalChatMessages}
-            onSendMessage={handleSendGlobalMessage}
-            isThinking={globalChatThinking}
-            onEditMessage={handleEditGlobalMessage}
-          />
-        </div>
-      </div>
-    )}
-
-    {/* Floating Global AI Button (visible when closed) */}
-    {selectedPdf && !showGlobalChat && (
-      <button
-        onClick={() => setShowGlobalChat(true)}
-        className="btn-primary animate-pulse-glow"
-        style={{
-          position: 'fixed',
-          bottom: '32px',
-          right: '32px',
-          width: '60px',
-          height: '60px',
-          borderRadius: '50%',
-          padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          boxShadow: '0 0 20px rgba(139, 92, 246, 0.6)',
-          zIndex: 99,
-          cursor: 'pointer',
-          transition: 'transform 0.2s ease-out'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.1)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-        }}
-      >
-        <Sparkles size={24} />
-      </button>
-    )}
-    {/* Selection Tooltip */}
-    {selectedText && tooltipPos && (
-      <div
-        id="selection-tooltip"
-        style={{
-          position: 'absolute',
-          left: `${tooltipPos.x}px`,
-          top: `${tooltipPos.y}px`,
-          transform: 'translateX(-50%)',
-          background: 'rgba(15, 23, 42, 0.95)',
-          border: '1px solid var(--border-color)',
-          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
-          borderRadius: '20px',
-          padding: '4px 8px',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          zIndex: 9999,
-          animation: 'fadeIn 0.15s ease-out',
-          backdropFilter: 'blur(8px)'
-        }}
-      >
-        <button
-          onClick={() => handleExplain('eli5')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: '#ffffff',
-            fontSize: '0.78rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            padding: '6px 10px',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            transition: 'background 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-        >
-          👶 ELI5
-        </button>
-        <span style={{ color: 'var(--border-color)', fontSize: '0.8rem' }}>|</span>
-        <button
-          onClick={() => handleExplain('deep_dive')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: '#ffffff',
-            fontSize: '0.78rem',
-            fontWeight: '600',
-            cursor: 'pointer',
-            padding: '6px 10px',
-            borderRadius: '12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '4px',
-            transition: 'background 0.2s'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
-        >
-          🔍 Deep Dive
-        </button>
-      </div>
-    )}
-
-    {/* Floating Explanation Drawer */}
-    {(explanationText || explanationLoading) && (
-      <div
-        id="explanation-popup"
-        className="glass-panel"
-        style={{
-          position: 'fixed',
-          top: '80px',
-          right: '24px',
-          width: '380px',
-          maxHeight: 'calc(100vh - 120px)',
-          background: 'rgba(10, 12, 18, 0.95)',
-          border: '1px solid var(--border-color)',
-          borderRadius: '16px',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
-          display: 'flex',
-          flexDirection: 'column',
-          zIndex: 10000,
-          overflow: 'hidden',
-          backdropFilter: 'blur(12px)',
-          animation: 'fadeIn 0.25s ease-out'
-        }}
-      >
-        {/* Header */}
-        <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.02)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ fontSize: '1.2rem' }}>
-              {explanationMode === 'eli5' ? '👶' : '🔍'}
-            </span>
-            <div>
-              <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: 0 }}>
-                {explanationMode === 'eli5' ? 'Explain Like I\'m 5' : 'Technical Deep Dive'}
-              </h4>
-              <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>VedaMate Smart Assistant</p>
-            </div>
-          </div>
-          <button
-            onClick={() => {
-              setExplanationText(null);
-              setExplanationContent('');
-            }}
-            style={{
-              background: 'transparent',
-              border: 'none',
-              color: 'var(--text-secondary)',
-              cursor: 'pointer',
-              padding: '4px',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <X size={16} />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div style={{ padding: '20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          {/* Highlighted text quote */}
-          <div style={{ borderLeft: '3px solid var(--accent-purple)', paddingLeft: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 8px 8px 0', padding: '10px 12px' }}>
-            <p style={{ fontSize: '0.78rem', fontStyle: 'italic', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.4' }}>
-              "{explanationText}"
-            </p>
-          </div>
-
-          {explanationLoading ? (
-            <div style={{ display: 'flex', height: '150px', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '10px' }}>
-              <RefreshCw size={24} className="skeleton" style={{ animation: 'spin 2s linear infinite' }} />
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Analyzing context...</span>
-            </div>
-          ) : (
-            <div style={{ fontSize: '0.88rem', lineHeight: '1.6', color: 'var(--text-primary)' }}>
-              {renderMarkdown(explanationContent)}
             </div>
           )}
+
         </div>
-      </div>
-    )}
-  </div>
-);
+      </main>
+
+      {/* 3. Global Textbook Assistant (Right Column) */}
+      {selectedPdf && (
+        <div
+          className="global-agent-panel"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'rgba(9, 13, 22, 0.4)',
+            borderLeft: showGlobalChat ? '1px solid var(--border-color)' : 'none',
+            height: '100vh',
+            overflow: 'hidden',
+            visibility: showGlobalChat ? 'visible' : 'hidden',
+            opacity: showGlobalChat ? 1 : 0,
+            transition: 'opacity 0.3s ease, visibility 0.3s ease'
+          }}
+        >
+          {/* Panel Header */}
+          <header style={{
+            height: '68px',
+            padding: '0 24px 0 32px',
+            borderBottom: '1px solid var(--border-color)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            background: 'rgba(10, 10, 10, 0.8)',
+            backdropFilter: 'blur(8px)',
+            boxSizing: 'border-box'
+          }}>
+            <div>
+              <h3 style={{ fontSize: '1.15rem', fontWeight: '800', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#a78bfa', boxShadow: '0 0 10px #a78bfa' }}></span>
+                Global Textbook Assistant
+              </h3>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '2px', margin: 0 }}>
+                Ask questions across the entire textbook scope
+              </p>
+            </div>
+
+            <button
+              onClick={() => setShowGlobalChat(false)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: '32px',
+                height: '32px',
+                borderRadius: '50%',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                e.currentTarget.style.color = '#ffffff';
+                e.currentTarget.style.transform = 'rotate(90deg)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'transparent';
+                e.currentTarget.style.color = 'var(--text-secondary)';
+                e.currentTarget.style.transform = 'rotate(0deg)';
+              }}
+            >
+              <X size={18} />
+            </button>
+          </header>
+
+          {/* Panel Body */}
+          <div style={{ flex: 1, padding: '24px', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+            <ChatTab
+              messages={globalChatMessages}
+              onSendMessage={handleSendGlobalMessage}
+              isThinking={globalChatThinking}
+              onEditMessage={handleEditGlobalMessage}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Floating Global AI Button (visible when closed) */}
+      {selectedPdf && !showGlobalChat && (
+        <button
+          onClick={() => setShowGlobalChat(true)}
+          className="btn-primary animate-pulse-glow"
+          style={{
+            position: 'fixed',
+            bottom: '32px',
+            right: '32px',
+            width: '60px',
+            height: '60px',
+            borderRadius: '50%',
+            padding: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 0 20px rgba(139, 92, 246, 0.6)',
+            zIndex: 99,
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease-out'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.1)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+          }}
+        >
+          <Sparkles size={24} />
+        </button>
+      )}
+      {/* Selection Tooltip */}
+      {selectedText && tooltipPos && (
+        <div
+          id="selection-tooltip"
+          style={{
+            position: 'absolute',
+            left: `${tooltipPos.x}px`,
+            top: `${tooltipPos.y}px`,
+            transform: 'translateX(-50%)',
+            background: 'rgba(15, 23, 42, 0.95)',
+            border: '1px solid var(--border-color)',
+            boxShadow: '0 4px 20px rgba(0, 0, 0, 0.4)',
+            borderRadius: '20px',
+            padding: '4px 8px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            zIndex: 9999,
+            animation: 'fadeIn 0.15s ease-out',
+            backdropFilter: 'blur(8px)'
+          }}
+        >
+          <button
+            onClick={() => handleExplain('eli5')}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#ffffff',
+              fontSize: '0.78rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              padding: '6px 10px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            👶 ELI5
+          </button>
+          <span style={{ color: 'var(--border-color)', fontSize: '0.8rem' }}>|</span>
+          <button
+            onClick={() => handleExplain('deep_dive')}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#ffffff',
+              fontSize: '0.78rem',
+              fontWeight: '600',
+              cursor: 'pointer',
+              padding: '6px 10px',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
+          >
+            🔍 Deep Dive
+          </button>
+        </div>
+      )}
+
+      {/* Floating Explanation Drawer */}
+      {(explanationText || explanationLoading) && (
+        <div
+          id="explanation-popup"
+          className="glass-panel"
+          style={{
+            position: 'fixed',
+            top: '80px',
+            right: '24px',
+            width: '380px',
+            maxHeight: 'calc(100vh - 120px)',
+            background: 'rgba(10, 12, 18, 0.95)',
+            border: '1px solid var(--border-color)',
+            borderRadius: '16px',
+            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            zIndex: 10000,
+            overflow: 'hidden',
+            backdropFilter: 'blur(12px)',
+            animation: 'fadeIn 0.25s ease-out'
+          }}
+        >
+          {/* Header */}
+          <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border-color)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(255, 255, 255, 0.02)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '1.2rem' }}>
+                {explanationMode === 'eli5' ? '👶' : '🔍'}
+              </span>
+              <div>
+                <h4 style={{ fontSize: '0.9rem', fontWeight: '800', margin: 0 }}>
+                  {explanationMode === 'eli5' ? 'Explain Like I\'m 5' : 'Technical Deep Dive'}
+                </h4>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', margin: 0 }}>VedaMate Smart Assistant</p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                setExplanationText(null);
+                setExplanationContent('');
+              }}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                padding: '4px',
+                borderRadius: '50%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              <X size={16} />
+            </button>
+          </div>
+
+          {/* Content */}
+          <div style={{ padding: '20px', overflowY: 'auto', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Highlighted text quote */}
+            <div style={{ borderLeft: '3px solid var(--accent-purple)', paddingLeft: '12px', background: 'rgba(255,255,255,0.02)', borderRadius: '0 8px 8px 0', padding: '10px 12px' }}>
+              <p style={{ fontSize: '0.78rem', fontStyle: 'italic', color: 'var(--text-secondary)', margin: 0, lineHeight: '1.4' }}>
+                "{explanationText}"
+              </p>
+            </div>
+
+            {explanationLoading ? (
+              <div style={{ display: 'flex', height: '150px', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: '10px' }}>
+                <RefreshCw size={24} className="skeleton" style={{ animation: 'spin 2s linear infinite' }} />
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Analyzing context...</span>
+              </div>
+            ) : (
+              <div style={{ fontSize: '0.88rem', lineHeight: '1.6', color: 'var(--text-primary)' }}>
+                {renderMarkdown(explanationContent)}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

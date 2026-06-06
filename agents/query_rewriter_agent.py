@@ -16,7 +16,8 @@ def query_rewriter_agent(state: AgentState) -> AgentState:
     llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL_NAME, # CORRECTED VARIABLE
         temperature=0,
-        convert_system_message_to_human=True
+        convert_system_message_to_human=True,
+        transport="rest",
     )
 
     prompt = ChatPromptTemplate.from_template(

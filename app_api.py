@@ -14,6 +14,19 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '.env'), override=True)
 if not os.getenv("GOOGLE_API_KEY") and os.getenv("GEMINI_API_KEY"):
     os.environ["GOOGLE_API_KEY"] = os.getenv("GEMINI_API_KEY")
 
+# Global monkey-patch for LangChain AIMessage to guarantee content is always a string.
+# Prevents 'list' object has no attribute 'strip' errors across the entire app.
+try:
+    from langchain_core.messages import AIMessage
+    from utils.config import safe_get_content
+    original_init = AIMessage.__init__
+    def patched_init(self, *args, **kwargs):
+        original_init(self, *args, **kwargs)
+        self.content = safe_get_content(self.content)
+    AIMessage.__init__ = patched_init
+except Exception:
+    pass
+
 from utils.config import PDF_STORAGE_PATH
 from utils.vector_db_utils import process_and_store_pdf, query_vector_db
 from utils.metadata_manager import load_metadata, save_metadata
@@ -230,34 +243,24 @@ async def get_chapter_assets(pdf_name: str, topic_name: str, regenerate: Optiona
         db_result = await query_vector_db(topic_name, collection_name)
         context = db_result.get("context_text", "")
 
-    updated = False
-    
-    # 1. Analogy/Hook
+    tasks = {}
     if not assets.get("hook"):
-        assets["hook"] = generate_hook(topic_name, profile, context)
-        updated = True
-        
-    # 2. Mermaid Chart Flowchart
+        tasks["hook"] = asyncio.to_thread(generate_hook, topic_name, profile, context)
     if not assets.get("mermaid_chart"):
-        assets["mermaid_chart"] = generate_mermaid_chart(topic_name, context)
-        updated = True
-
-    # 3. Scenario Sandbox
+        tasks["mermaid_chart"] = asyncio.to_thread(generate_mermaid_chart, topic_name, context)
     if not assets.get("scenario"):
-        assets["scenario"] = generate_scenario(topic_name, profile, context)
-        updated = True
-
-    # 4. Active Recall Flashcards
+        tasks["scenario"] = asyncio.to_thread(generate_scenario, topic_name, profile, context)
     if not assets.get("flashcards"):
-        assets["flashcards"] = generate_flashcards(topic_name, profile, context)
-        updated = True
-
-    # 5. Curator Recommended Study Resources
+        tasks["flashcards"] = asyncio.to_thread(generate_flashcards, topic_name, profile, context)
     if not assets.get("resources"):
-        assets["resources"] = generate_resources(topic_name, context)
-        updated = True
+        tasks["resources"] = asyncio.to_thread(generate_resources, topic_name, context)
 
-    if updated:
+    if tasks:
+        keys = list(tasks.keys())
+        results = await asyncio.gather(*[tasks[k] for k in keys])
+        for k, res in zip(keys, results):
+            assets[k] = res
+        
         meta["mastery_assets"][topic_name] = assets
         save_metadata(pdf_name, meta)
 

@@ -6,6 +6,19 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# Global monkey-patch for LangChain AIMessage to guarantee content is always a string.
+# Prevents 'list' object has no attribute 'strip' errors across the entire app.
+try:
+    from langchain_core.messages import AIMessage
+    from utils.config import safe_get_content
+    original_init = AIMessage.__init__
+    def patched_init(self, *args, **kwargs):
+        original_init(self, *args, **kwargs)
+        self.content = safe_get_content(self.content)
+    AIMessage.__init__ = patched_init
+except Exception:
+    pass
+
 from utils.config import PDF_STORAGE_PATH
 from utils.vector_db_utils import process_and_store_pdf
 from utils.metadata_manager import load_metadata, save_metadata

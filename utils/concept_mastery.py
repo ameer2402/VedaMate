@@ -2,7 +2,7 @@ import json
 import re
 import logging
 from langchain_google_genai import ChatGoogleGenerativeAI
-from utils.config import GEMINI_MODEL_NAME
+from utils.config import GEMINI_MODEL_NAME, safe_get_content
 
 logger = logging.getLogger(__name__)
 
@@ -11,13 +11,15 @@ def _get_llm(temperature: float = 0.2):
         model=GEMINI_MODEL_NAME,
         temperature=temperature,
         convert_system_message_to_human=True,
+        transport="rest",
     )
 
-def _clean_json_response(content: str) -> str:
+def _clean_json_response(content) -> str:
+    content_str = safe_get_content(content)
     # Remove markdown code blocks if the LLM outputted them
-    content = re.sub(r'```json\s*', '', content)
-    content = re.sub(r'```\s*', '', content)
-    return content.strip()
+    content_str = re.sub(r'```json\s*', '', content_str)
+    content_str = re.sub(r'```\s*', '', content_str)
+    return content_str.strip()
 
 def generate_hook(topic: str, persona: dict, context: str) -> str:
     """
@@ -44,7 +46,7 @@ The summary must be exhaustive, ensuring the student does NOT miss any critical 
 """
     try:
         response = llm.invoke(prompt)
-        return response.content.strip()
+        return safe_get_content(response.content).strip()
     except Exception as e:
         logger.error(f"Error generating summary: {e}")
         return f"Welcome to studying **{topic}**! Take a look at the textbook sections to explore this concept in depth."
@@ -71,7 +73,7 @@ def generate_mermaid_chart(topic: str, context: str) -> str:
 """
     try:
         response = llm.invoke(prompt)
-        text = response.content.strip()
+        text = safe_get_content(response.content).strip()
         
         # Robust extraction:
         # 1. Look for ```mermaid ... ``` or ``` ... ``` blocks
@@ -334,7 +336,7 @@ Text to explain:
 Explanation:"""
     try:
         res = llm.invoke(prompt)
-        return res.content.strip()
+        return safe_get_content(res.content).strip()
     except Exception as e:
         logger.error(f"Error explaining concept: {e}")
         return f"Could not generate explanation: {str(e)}"

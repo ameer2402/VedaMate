@@ -10,6 +10,7 @@ def quiz_agent(state: AgentState) -> AgentState:
         model=GEMINI_MODEL_NAME,
         temperature=0.3,
         convert_system_message_to_human=True,
+        transport="rest",
     )
     
     prompt = ChatPromptTemplate.from_template(QUIZ_GENERATION_PROMPT)

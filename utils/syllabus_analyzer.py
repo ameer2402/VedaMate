@@ -45,6 +45,7 @@ def analyze_syllabus(pdf_path: str, user_syllabus: str = "") -> list:
     llm = ChatGoogleGenerativeAI(
         model=GEMINI_MODEL_NAME,
         temperature=0.2,
+        transport="rest",
     )
     
     if not text.strip():
