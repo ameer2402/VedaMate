@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://capsule-render.vercel.app/api?type=venom&color=0:090D16,50:6366F1,100:090D16&height=240&section=header&text=VEDAMATE&fontSize=70&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Stateful%20Multi-Agent%20AI%20Tutor%20%26%20Courseware%20Platform&descSize=20&descAlignY=62&descAlign=50"/>
+<img src="https://capsule-render.vercel.app/api?type=venom&color=0:090D16,50:6366F1,100:090D16&height=240&section=header&text=VEDAMATE&fontSize=70&fontColor=ffffff&animation=fadeIn&fontAlignY=38&desc=Stateful%20Multi-Agent%20AI%20Tutor%20and%20Courseware%20Platform&descSize=20&descAlignY=62&descAlign=50"/>
 
 <h3>🎓 Transform Static Textbooks into Intelligent Conversational Learning Partners 🤖</h3>
 
